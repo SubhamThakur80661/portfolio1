@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subham Thakur | Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            cursor: none;
+            overflow-x: hidden;
+            background-color: #0e0e0e; /* Slightly softer dark background */
+            color: #e0e0e0; /* Softer white text */
+        }
+
+        .custom-cursor {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: exclusion;
+            transition: transform 0.1s ease-out, width 0.3s ease, height 0.3s ease;
+            z-index: 9999;
+            background-color: rgba(76, 175, 80, 0.4);
+        }
+
+        a:hover .custom-cursor, button:hover .custom-cursor, .project-card:hover .custom-cursor {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(76, 175, 80, 0.6);
+        }
+
+        .project-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+            background-color: #1a1a1a;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .shine-effect {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shine-effect::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: skewX(-30deg);
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .shine-effect:hover::after {
+            transform: skewX(-30deg) translateX(200%);
+        }
+
+        .contact-form input, .contact-form textarea {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            border: 1px solid #333;
+        }
+
+        .contact-form input:focus, .contact-form textarea:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 1s ease-out;
+        }
+
+        .social-icons-wrapper a {
+            transition: color 0.3s ease;
+        }
+
+        /* Certificate card text color for dark mode */
+        .certificate-card h3, .certificate-card p {
+            color: #e0e0e0;
+        }
+
+        .project-card h3, .internship-card h3, .education-card h3 {
+            color: #e0e0e0;
+        }
+
+        .project-card p, .internship-card p, .education-card p, .project-card span {
+            color: #e0e0e0;
+        }
+
+        .text-gray-400 {
+            color: #a0a0a0; /* More readable in dark mode */
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="dark">
+
+    <!-- Custom Cursor -->
+    <div class="custom-cursor"></div>
+
+    <!-- Main Container -->
+    <div class="container mx-auto px-4 py-8 md:py-16">
+
+        <!-- Header/Navigation -->
+        <header class="flex justify-between items-center py-4 mb-16">
+            <a href="#" class="text-xl font-bold rounded-lg p-2 shine-effect">Subham</a>
+            <nav class="flex items-center space-x-4">
+                <a href="#projects" class="text-sm md:text-base hover:text-green-400 transition-colors duration-300 rounded-lg p-2 shine-effect">Projects</a>
+                <a href="#about" class="text-sm md:text-base hover:text-green-400 transition-colors duration-300 rounded-lg p-2 shine-effect">About</a>
+                <a href="#skills" class="text-sm md:text-base hover:text-green-400 transition-colors duration-300 rounded-lg p-2 shine-effect">Skills</a>
+                <a href="#contact" class="text-sm md:text-base hover:text-green-400 transition-colors duration-300 rounded-lg p-2 shine-effect">Contact</a>
+            </nav>
+        </header>
+
+        <!-- Hero Section -->
+        <section id="hero" class="text-center py-16 md:py-24 animate-fade-in">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4">
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">
+                    Hello, I'm Subham.
+                </span>
+            </h1>
+            <p class="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-8">
+                A passionate Software Development Intern with expertise in AI, web development, and data structures. I craft intuitive and powerful digital experiences that solve real-world problems.
+            </p>
+            <a href="#projects" class="bg-gradient-to-r from-green-400 to-blue-500 text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                View My Work
+            </a>
+        </section>
+
+        <!-- Featured Projects Section -->
+        <section id="projects" class="py-16 md:py-24">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Projects</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Project Card 1: MultiPDF Chat Application -->
+                <div class="project-card p-6 rounded-lg shadow-md hover:bg-[#2a2a2a] shine-effect">
+                    <h3 class="text-xl font-semibold mb-2">MultiPDF Chat Application</h3>
+                    <p class="text-sm mb-4">Developed an interactive chat application that allows users to ask natural language questions across multiple PDF documents.</p>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <span class="bg-gray-700 text-gray-300 px-2 py-1 rounded-full">Python</span>
+                        <span class="bg-gray-700 text-gray-300 px-2 py-1 rounded-full">LangChain</span>
+                        <span class="bg-gray-700 text-gray-300 px-2 py-1 rounded-full">OpenAI API</span>
+                        <span class="bg-gray-700 text-gray-300 px-2 py-1 rounded-full">Streamlit</span>
+                    </div>
+                    <div class="flex justify-between mt-4">
+                        <a href="https://github.com/SubhamThakur80661/Ask-Pdf-open-ai-/tree/master/ask-multiple-pdfs-main" target="_blank" class="text-sm text-green-400 hover:underline">View Code</a>
+                    </div>
+                </div>
+                <!-- Project Card 2: Organization Website -->
+                <div class="project-card p-6 rounded-lg shadow-md hover:bg-[#2a2a2a] shine-effect">
+                    <h3 class="text-xl font-semibold mb-2">Organization Website</h3>
+                    <p class="text-sm mb-4">A website showcasing the organization, including team information and user registration features.</p>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <span class="bg-gray-700 text-gray-300 px-2 py-1 rounded-full">HTML</span>
+                        <span class="bg-gray-700 text-gray-300 px-2 py-1 rounded-full">CSS</span>
+                        <span class="bg-gray-700 text-gray-300 px-2 py-1 rounded-full">JavaScript</span>
+                        <span class="bg-gray-700 text-gray-300 px-2 py-1 rounded-full">PHP</span>
+                    </div>
+                    <div class="flex justify-between mt-4">
+                        <a href="https://github.com/SubhamThakur80661/organizationmanagementsystem" target="_blank" class="text-sm text-green-400 hover:underline">View Code</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Training and Internship Section -->
+        <section id="internship" class="py-16 md:py-24">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Training & Internship</h2>
+            <div class="max-w-4xl mx-auto bg-[#1a1a1a] p-8 rounded-lg shadow-md internship-card">
+                <h3 class="text-xl font-semibold text-green-400 mb-2">Software Development Intern</h3>
+                <p class="text-gray-400 mb-2">AFFINZY ADVERTISING PRIVATE LIMITED</p>
+                <p class="text-gray-500 text-sm mb-4">May 2025 - June 2025</p>
+                <ul class="list-disc list-inside text-gray-400 space-y-2">
+                    <li>Developed applications (coding and programming)</li>
+                    <li>Debugged and tested application logic and components</li>
+                    <li>Documented software workflows and performed application-level testing</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Certificates Section -->
+        <section id="certificates" class="py-16 md:py-24">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Certificates</h2>
+            <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="certificate-card p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold mb-1">Generative AI with LLM</h3>
+                    <p class="text-gray-500 text-sm">Oct 2024 - Dec 2024</p>
+                </div>
+                <div class="certificate-card p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold mb-1">Prompt Engineering</h3>
+                    <p class="text-gray-500 text-sm">July 2024 - Aug 2024</p>
+                </div>
+                <div class="certificate-card p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold mb-1">Mastering Data Structures and Algorithms using C and C++</h3>
+                    <p class="text-500 text-sm">April 2024 - May 2024</p>
+                </div>
+                <div class="certificate-card p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold mb-1">ChatGPT Playground for Beginners: Intro to NLP AI</h3>
+                    <p class="text-gray-500 text-sm">Jan 2024 - Feb 2024</p>
+                </div>
+                <div class="certificate-card p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold mb-1">ChatGPT Advanced Data Analysis</h3>
+                    <p class="text-gray-500 text-sm">Mar 2023 - April 2023</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Education Section -->
+        <section id="education" class="py-16 md:py-24">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Education</h2>
+            <div class="max-w-4xl mx-auto bg-[#1a1a1a] p-8 rounded-lg shadow-md education-card">
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold mb-1">Lovely Professional University</h3>
+                    <p class="text-gray-400">Bachelor of Technology in Computer Science and Engineering</p>
+                    <p class="text-gray-500 text-sm">Jalandhar, Punjab | CGPA: 6.9 | Since November 2022</p>
+                </div>
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold mb-1">ABM Sr Sec School</h3>
+                    <p class="text-gray-400">Intermediate</p>
+                    <p class="text-gray-500 text-sm">Palampur, Himachal Pradesh | CGPA: 8.3 | March 2020 - April 2021</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold mb-1">Rainbow International School</h3>
+                    <p class="text-gray-400">Matriculation</p>
+                    <p class="text-gray-500 text-sm">Kangra, Himachal Pradesh | CGPA: 6.6 | March 2018 - April 2019</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Me Section -->
+        <section id="about" class="py-16 md:py-24">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">About Me</h2>
+            <div class="max-w-4xl mx-auto flex flex-col md:flex-row items-center md:space-x-8">
+                <div class="md:w-1/3 mb-8 md:mb-0">
+                    <img src="src/subhamphoto.jpg" alt="Subham's Photo" class="w-full h-auto rounded-full object-cover shadow-lg">
+                </div>
+                <div class="md:w-2/3">
+                    <p class="about-text mb-6 leading-relaxed">
+                        My journey in technology began with a passion for problem-solving. I am a **Software Development Intern** with **Affinzy Advertising Private Limited**, where I've gained hands-on experience in debugging, testing, and documenting software workflows. My academic background from **Lovely Professional University** has provided me with a strong foundation in computer science principles.
+                    </p>
+                    <p class="about-text leading-relaxed">
+                        I specialize in creating innovative solutions using a diverse tech stack, including **Python, ReactJS, and NodeJS**. My project experience, particularly in **AI and web development**, demonstrates my ability to build user-friendly and impactful applications. I am a quick learner and a dedicated team player, always eager to take on new challenges and contribute to a collaborative environment.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section id="skills" class="py-16 md:py-24">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Skills</h2>
+            <div class="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div class="flex flex-col items-center">
+                    <div class="text-5xl mb-2 text-green-400"><i class="fas fa-code"></i></div>
+                    <h3 class="text-lg font-semibold mb-2">Languages</h3>
+                    <p class="text-gray-400">Python, C, C++, Java, PHP, HTML, CSS</p>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="text-5xl mb-2 text-green-400"><i class="fas fa-cubes"></i></div>
+                    <h3 class="text-lg font-semibold mb-2">Frameworks</h3>
+                    <p class="text-gray-400">CSS, Bootstrap, NodeJS, ReactJS</p>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="text-5xl mb-2 text-green-400"><i class="fas fa-database"></i></div>
+                    <h3 class="text-lg font-semibold mb-2">Tools/Platforms</h3>
+                    <p class="text-gray-400">MySQL, MongoDB</p>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="text-5xl mb-2 text-green-400"><i class="fas fa-users"></i></div>
+                    <h3 class="text-lg font-semibold mb-2">Soft Skills</h3>
+                    <p class="text-gray-400">Social Engagement, Teamwork, Adaptability, Time Management</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-16 md:py-24">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Let's Connect</h2>
+            <div class="max-w-xl mx-auto contact-form">
+                <form id="contactForm">
+                    <div class="mb-4">
+                        <label for="name" class="block text-sm font-semibold mb-2">Name</label>
+                        <input type="text" id="name" name="name" class="w-full p-3 rounded-md" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="email" class="block text-sm font-semibold mb-2">Email</label>
+                        <input type="email" id="email" name="email" class="w-full p-3 rounded-md" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="message" class="block text-sm font-semibold mb-2">Message</label>
+                        <textarea id="message" name="message" rows="5" class="w-full p-3 rounded-md" required></textarea>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="bg-gradient-to-r from-green-400 to-blue-500 text-white font-semibold py-3 px-12 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                            Send Message
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center text-gray-500 text-sm mt-16 pt-8 border-t border-gray-700">
+            <p>&copy; 2025 Subham. All Rights Reserved.</p>
+            <div class="flex justify-center space-x-4 mt-4 social-icons-wrapper">
+                <a href="https://www.linkedin.com/in/shubhamthakur1030" target="_blank" class="hover:text-green-400 transition-colors duration-300"><i class="fab fa-linkedin fa-2x"></i></a>
+                <a href="https://github.com/SubhamThakur80661" target="_blank" class="hover:text-green-400 transition-colors duration-300"><i class="fab fa-github fa-2x"></i></a>
+                <a href="mailto:shubhamthakur80661@gmail.com" class="hover:text-green-400 transition-colors duration-300"><i class="fas fa-envelope fa-2x"></i></a>
+            </div>
+        </footer>
+
+    </div>
+    
+    <!-- Scroll to Top Button -->
+    <button id="scrollToTopBtn" class="fixed bottom-4 right-4 bg-green-500 text-white p-4 rounded-full shadow-lg z-50 opacity-0 transition-opacity duration-300">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // Custom cursor logic
+        const cursor = document.querySelector('.custom-cursor');
+        document.addEventListener('mousemove', e => {
+            cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+        });
+
+        const interactives = document.querySelectorAll('a, button, .project-card');
+        interactives.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursor.style.width = '60px';
+                cursor.style.height = '60px';
+                cursor.style.backgroundColor = 'rgba(76, 175, 80, 0.6)';
+            });
+            el.addEventListener('mouseleave', () => {
+                cursor.style.width = '30px';
+                cursor.style.height = '30px';
+                cursor.style.backgroundColor = 'rgba(76, 175, 80, 0.4)';
+            });
+        });
+        
+        // Contact form submission logic (for demonstration)
+        const contactForm = document.getElementById('contactForm');
+        if (contactForm) {
+            contactForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const formData = new FormData(this);
+                const name = formData.get('name');
+                const message = `Thank you, ${name}! Your message has been received.`;
+                const messageBox = document.createElement('div');
+                messageBox.style.cssText = `
+                    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                    background-color: #1a1a1a; padding: 2rem; border-radius: 0.5rem;
+                    box-shadow: 0 10px 20px rgba(0,0,0,0.5); z-index: 10000;
+                    color: #e0e0e0; text-align: center;
+                `;
+                messageBox.innerHTML = `
+                    <p>${message}</p>
+                    <button onclick="this.parentNode.remove()" style="margin-top: 1rem; padding: 0.5rem 1rem; border-radius: 9999px; background-color: #4CAF50; color: white;">OK</button>
+                `;
+                document.body.appendChild(messageBox);
+                this.reset();
+            });
+        }
+        
+        // Scroll to Top Button Logic
+        const scrollToTopBtn = document.getElementById("scrollToTopBtn");
+        window.onscroll = function() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                scrollToTopBtn.style.opacity = "1";
+            } else {
+                scrollToTopBtn.style.opacity = "0";
+            }
+        };
+
+        scrollToTopBtn.addEventListener("click", () => {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        });
+
+    </script>
+</body>
+</html>
