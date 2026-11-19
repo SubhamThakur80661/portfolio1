@@ -81,7 +81,7 @@
   @media (hover:none), (max-width:767px) { #revealCanvas { display:none; } }
   #spiderLayer { z-index:2; opacity:0; transition:opacity .5s ease; pointer-events:none; }
   .spider-hint { position:absolute; z-index:7; display:flex; align-items:center; gap:10px; color:var(--red); font-size:10px; letter-spacing:.22em; font-weight:600; white-space:nowrap; opacity:0; transition:opacity .4s ease; pointer-events:none; text-transform:uppercase; }
-  .spider-hint.visible { animation:hintPulse 2.2s ease-in-out infinite; }
+  .spider-hint.visible { opacity:1; animation:hintPulse 2.2s ease-in-out infinite; }
   .spider-hint-line { display:block; width:28px; height:1px; background:rgba(255,42,42,.7); flex:none; }
   @keyframes hintPulse { 0%,100% { opacity:.55; } 50% { opacity:1; } }
   .red-circle { --d:min(76vh,88vw,680px); position:absolute; left:calc(50% - var(--d)/2); top:calc(50% - var(--d)/2); width:var(--d); height:var(--d); border:1px solid rgba(255,42,42,.8); border-radius:50%; z-index:3; pointer-events:none; }
@@ -182,7 +182,8 @@
   .contact-panel::before { content:''; position:absolute; top:0; left:50%; transform:translateX(-50%); width:120px; height:2px; background:var(--red); }
   .contact-panel .lede { margin-left:auto; margin-right:auto; }
   .contact-btns { display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin-top:32px; }
-  .btn-red { background:var(--red); color:#fff; font-weight:600; font-size:15px; padding:14px 26px; border-radius:12px; display:inline-flex; transition:transform .2s, filter .2s; word-break:break-all; }
+  .btn-red { background:var(--red); color:#fff; font-weight:600; font-size:15px; padding:14px 26px; border-radius:12px; display:inline-flex; transition:transform .2s, filter .2s; white-space:nowrap; }
+  @media (max-width:480px) { .btn-red { font-size:13px; padding:14px 18px; } }
   .btn-red:hover { transform:translateY(-2px); filter:brightness(1.12); }
   .btn-ghost2 { border:1px solid rgba(255,255,255,.2); font-weight:600; font-size:15px; padding:14px 26px; border-radius:12px; display:inline-flex; transition:transform .2s, border-color .2s; }
   .btn-ghost2:hover { transform:translateY(-2px); border-color:var(--red); }
@@ -646,9 +647,16 @@ setTimeout(function () {
       if (left < 10) { left = z.x0 - sr.left + (z.x1 - z.x0) / 2 - hw / 2; top = z.y0 - sr.top - 28; }
     } else {
       left = z.x0 - sr.left + (z.x1 - z.x0) / 2 - hw / 2;
-      top = z.y1 - sr.top + 12;
-      if (top + hh > sr.height - 150) top = z.y0 - sr.top - 28; /* keep clear of the bottom overlay */
+      /* sit just below the red circle, clear of the image and the overlay */
+      var d = Math.min(0.76 * sr.height, 0.88 * sr.width, 680); /* matches .red-circle --d */
+      top = (sr.height + d) / 2 + 10;
+      var overlayTop = heroBottom ? heroBottom.getBoundingClientRect().top - sr.top : sr.height;
+      if (top + hh > overlayTop - 8) {
+        top = z.y0 - sr.top - 28; /* no room below: above the model */
+        if (top < 4) top = z.y1 - sr.top - hh - 10; /* last resort: inside, bottom of the zone */
+      }
     }
+    left = Math.max(8, Math.min(left, sr.width - hw - 8)); /* never off the sides */
     spiderHint.style.left = Math.round(left) + 'px';
     spiderHint.style.top = Math.round(top) + 'px';
   }
