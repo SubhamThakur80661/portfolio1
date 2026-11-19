@@ -2,7 +2,7 @@
 
 Personal portfolio website. Static site — no build step.
 
-- **Live:** https://subham-thakur-hydra-hamerins-projects.vercel.app
+- **Live:** https://subham-thakur.vercel.app
 - **Stack:** HTML + Tailwind CSS (CDN) + Three.js hero scene + GSAP scroll motion
 - **Photo:** `src/frontface.jpg`
 
