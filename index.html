@@ -74,18 +74,16 @@
   .hero-sticky { position:sticky; top:0; height:100vh; height:100svh; overflow:hidden; display:flex; align-items:center; justify-content:center; }
   .ghost-text { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:19vw; font-weight:900; letter-spacing:-.02em; white-space:nowrap; color:transparent; -webkit-text-stroke:1px rgba(255,42,42,.16); z-index:0; user-select:none; pointer-events:none; }
   .hero-stage { position:absolute; inset:0; z-index:1; will-change:transform; }
-  .hero-stage img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; user-select:none; -webkit-user-drag:none; }
-  .hero-frame { opacity:0; }
-  #frame1 { opacity:1; }
+  .hero-stage img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; user-select:none; -webkit-user-drag:none; }
   #revealCanvas { position:absolute; inset:0; width:100%; height:100%; z-index:4; pointer-events:none; }
   @media (hover:none), (max-width:767px) { #revealCanvas { display:none; } }
-  #spiderLayer { z-index:2; opacity:0; transition:opacity .5s ease; pointer-events:none; }
+  #spiderLayer { z-index:2; opacity:0; transition:opacity .5s ease; pointer-events:none; object-position:center 25%; }
   .spider-hint { position:absolute; z-index:7; display:flex; align-items:center; gap:10px; color:var(--red); font-size:10px; letter-spacing:.22em; font-weight:600; white-space:nowrap; opacity:0; transition:opacity .4s ease; pointer-events:none; text-transform:uppercase; }
   .spider-hint.visible { opacity:1; animation:hintPulse 2.2s ease-in-out infinite; }
   .spider-hint-line { display:block; width:28px; height:1px; background:rgba(255,42,42,.7); flex:none; }
   @keyframes hintPulse { 0%,100% { opacity:.55; } 50% { opacity:1; } }
   .red-circle { --d:min(76vh,88vw,680px); position:absolute; left:calc(50% - var(--d)/2); top:calc(50% - var(--d)/2); width:var(--d); height:var(--d); border:1px solid rgba(255,42,42,.8); border-radius:50%; z-index:3; pointer-events:none; }
-  .hero-bottom { position:absolute; left:0; right:0; bottom:0; z-index:5; padding:0 24px 24px; }
+  .hero-bottom { position:absolute; left:0; right:0; bottom:0; z-index:5; padding:0 24px 24px; background:linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,.18) 60%, transparent); }
   @media (min-width:768px) { .hero-bottom { padding:0 64px 36px; } }
   .hero-bottom-row { display:flex; justify-content:space-between; align-items:flex-end; gap:24px; max-width:1800px; margin:0 auto 24px; }
   .hero-tag { width:32px; height:1px; background:var(--red); margin-bottom:20px; }
@@ -251,16 +249,7 @@ setTimeout(function () {
   <div class="hero-sticky" id="top">
     <div class="ghost-text" aria-hidden="true">SUBHAM</div>
     <div class="hero-stage" id="heroStage">
-      <img class="hero-frame" id="frame1" src="src/hero/frame-01.webp" alt="Subham Thakur in a black suit, head bowed, standing on a red block" draggable="false" fetchpriority="high">
-      <img class="hero-frame" id="frame2" src="src/hero/frame-02.webp" alt="Subham Thakur in a black suit, head lifting" draggable="false">
-      <img class="hero-frame" id="frame3" src="src/hero/frame-03.webp" alt="Subham Thakur in a black suit, head half-raised" draggable="false">
-      <img class="hero-frame" id="frame4" src="src/hero/frame-04.webp" alt="Subham Thakur in a black suit, looking up at the camera" draggable="false">
-      <img class="hero-frame" id="frame5" src="src/hero/frame-05.webp" alt="Subham Thakur in a black suit, camera descending" draggable="false">
-      <img class="hero-frame" id="frame6" src="src/hero/frame-06.webp" alt="Subham Thakur in a black suit, three-quarter view" draggable="false">
-      <img class="hero-frame" id="frame7" src="src/hero/frame-07.webp" alt="Subham Thakur in a black suit, front-facing studio portrait" draggable="false">
-      <img class="hero-frame" id="frame8" src="src/hero/frame-08.webp" alt="Subham Thakur in a black suit, warming red light" draggable="false">
-      <img class="hero-frame" id="frame9" src="src/hero/frame-09.webp" alt="Subham Thakur in a black suit, pre-finale" draggable="false">
-      <img class="hero-frame" id="frame10" src="src/hero/frame-10.webp" alt="Subham Thakur in a black suit, noir finale" draggable="false">
+      <img id="heroVideoImg" src="src/hero/video/vf-001.webp" alt="Subham Thakur in a black suit — head bowed, then lifting to face the camera" draggable="false" fetchpriority="high">
       <img id="spiderLayer" src="src/hero/spider.webp" alt="" aria-hidden="true" draggable="false">
       <canvas id="revealCanvas" aria-hidden="true"></canvas>
     </div>
@@ -519,7 +508,25 @@ setTimeout(function () {
   function sstep(a, b, x) { var t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); }
   function easeOutCubic(x) { return 1 - Math.pow(1 - x, 3); }
 
-  var HERO_SRC = ['src/hero/frame-01.webp', 'src/hero/frame-02.webp', 'src/hero/frame-03.webp', 'src/hero/frame-04.webp', 'src/hero/frame-05.webp', 'src/hero/frame-06.webp', 'src/hero/frame-07.webp', 'src/hero/frame-08.webp', 'src/hero/frame-09.webp', 'src/hero/frame-10.webp', 'src/hero/spider.webp'];
+  /* ---------- Video frames: 190 real frames (Google Flow / Veo 3.1 Lite,
+     8s clip @ 24fps, 1280x688 webp). Frame 1 = head bowed, frame 190 =
+     face to camera with red smoke. ---------- */
+  var FRAME_N = 190;
+  var SPIDER_SRC = 'src/hero/spider.webp';
+  var FINALE_SRC = 'src/hero/video/vf-190.webp';
+  var loaded = [], failed = [], loadingSet = {};
+  function frameSrc(i) {
+    var s = String(i);
+    while (s.length < 3) s = '0' + s;
+    return 'src/hero/video/vf-' + s + '.webp';
+  }
+  function countLoaded() {
+    var n = 0;
+    for (var i = 1; i <= FRAME_N; i++) if (loaded[i]) n++;
+    return n;
+  }
+  window.__framesTotal = FRAME_N;
+  window.__framesLoaded = 0;
 
   /* ---------- Preloader ---------- */
   var preloader = document.getElementById('preloader');
@@ -530,6 +537,7 @@ setTimeout(function () {
     if (preDone) return;
     preDone = true;
     window.__pfDone = true;
+    startBackgroundLoad(); /* the rest of the frames keep loading behind the hero */
     document.documentElement.style.overflow = '';
     if (!preloader) return;
     if (hasGsap && !instant) {
@@ -549,59 +557,126 @@ setTimeout(function () {
     if (hasST) ScrollTrigger.refresh();
     startIntro();
   }
-  var loadedCount = 0;
-  function countOne() {
-    loadedCount++;
-    if (loadPct) loadPct.textContent = Math.round((loadedCount / HERO_SRC.length) * 100) + '%';
-    if (loadedCount >= HERO_SRC.length) setTimeout(function () { finishPreloader(false); }, 250);
+  /* Critical set: frames 1-30 (the first stretch of the scroll) + frame 190
+     (finale / reduced-motion static / light-reveal source) + the spider.
+     The preloader counts only these; the rest load in the background. */
+  var CRITICAL = [];
+  for (var ci = 1; ci <= 30; ci++) CRITICAL.push(ci);
+  CRITICAL.push(190);
+  var CRITICAL_TOTAL = CRITICAL.length + 1; /* + spider */
+  var criticalLoaded = 0;
+  function countCritical() {
+    criticalLoaded++;
+    if (loadPct) loadPct.textContent = Math.round((criticalLoaded / CRITICAL_TOTAL) * 100) + '%';
+    if (criticalLoaded >= CRITICAL_TOTAL) setTimeout(function () { finishPreloader(false); }, 250);
   }
-  HERO_SRC.forEach(function (src) {
+  CRITICAL.forEach(function (idx) {
+    loadingSet[idx] = true;
     var im = new Image();
-    im.onload = countOne;
-    im.onerror = countOne; /* never hang on a failed image */
-    im.src = src;
+    im.onload = function () {
+      delete loadingSet[idx]; loaded[idx] = true;
+      window.__framesLoaded = countLoaded();
+      updateShownFrame();
+      countCritical();
+    };
+    im.onerror = function () { delete loadingSet[idx]; failed[idx] = true; countCritical(); };
+    im.src = frameSrc(idx);
   });
+  var spiderPre = new Image();
+  spiderPre.onload = countCritical;
+  spiderPre.onerror = countCritical; /* never hang on a failed image */
+  spiderPre.src = SPIDER_SRC;
   setTimeout(function () { finishPreloader(false); }, 9000); /* hard safety */
   var skipBtn = document.getElementById('skipLoad');
   if (skipBtn) skipBtn.addEventListener('click', function () { finishPreloader(true); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') finishPreloader(true); });
 
-  /* ---------- Hero scrub: 10-frame scroll sequence ----------
-     Frame i (0-based) dominates at p = i/9. Each frame crossfades with its
-     neighbours over a window centred halfway between the two dominance
-     points, so the scroll reads as one continuous shot. */
-  var FRAME_N = 10;
-  var FRAME_HALF = 0.035; /* half-width of each crossfade window */
-  var frameEls = [];
-  for (var fi = 1; fi <= FRAME_N; fi++) frameEls.push(document.getElementById('frame' + fi));
+  /* ---------- Hero scrub: single-element video-frame scroll ----------
+     ONE <img> whose src follows scroll progress: frame = round(p*189)+1.
+     Only LOADED frames are ever shown — the scrub shows the nearest loaded
+     frame at or before the target, so the hero is never blank while the
+     background loader catches up. */
+  var heroVideoImg = document.getElementById('heroVideoImg');
   var heroStage = document.getElementById('heroStage');
   var heroBottom = document.getElementById('heroBottom');
   var heroScroll = document.getElementById('heroScroll');
   var heroProgress = 0;
-  function frameOpacity(i, p) {
-    var o = 1;
-    if (i > 0) {
-      var cIn = (i - 0.5) / (FRAME_N - 1);
-      o *= sstep(cIn - FRAME_HALF, cIn + FRAME_HALF, p);
-    }
-    if (i < FRAME_N - 1) {
-      var cOut = (i + 0.5) / (FRAME_N - 1);
-      o *= 1 - sstep(cOut - FRAME_HALF, cOut + FRAME_HALF, p);
-    }
-    return o;
+  var heroTargetFrame = 1, heroShownFrame = 1;
+  window.__heroFrame = 1;
+  window.__heroFrameTarget = 1;
+  function targetFrameFor(p) { return Math.round(p * (FRAME_N - 1)) + 1; }
+  function nearestLoadedAtOrBefore(t) {
+    for (var i = t; i >= 1; i--) if (loaded[i]) return i;
+    return 1; /* frame 1 is in the critical set; never blank */
   }
+  function updateShownFrame() {
+    if (!heroVideoImg) return;
+    var best = nearestLoadedAtOrBefore(heroTargetFrame);
+    if (best !== heroShownFrame) {
+      heroShownFrame = best;
+      heroVideoImg.src = frameSrc(best);
+      window.__heroFrame = best;
+    }
+  }
+
+  /* Background loader: fills in the remaining frames after the preloader,
+     6 at a time, always prioritising a window around the current scroll
+     target so a fast scroll never outruns the cache for long. */
+  var bgStarted = false, bgActive = 0;
+  var BG_CONCURRENCY = 6;
+  function startBackgroundLoad() {
+    if (bgStarted) return;
+    bgStarted = true;
+    pumpQueue();
+  }
+  function nextBgIndex() {
+    var t = heroTargetFrame, d, i;
+    for (d = 0; d <= 30; d++) {
+      if (t + d <= FRAME_N && !loaded[t + d] && !failed[t + d] && !loadingSet[t + d]) return t + d;
+      if (d > 0 && t - d >= 1 && !loaded[t - d] && !failed[t - d] && !loadingSet[t - d]) return t - d;
+    }
+    for (i = 1; i <= FRAME_N; i++) if (!loaded[i] && !failed[i] && !loadingSet[i]) return i;
+    return 0;
+  }
+  function pumpQueue() {
+    if (!bgStarted) return;
+    while (bgActive < BG_CONCURRENCY) {
+      var idx = nextBgIndex();
+      if (!idx) return;
+      bgActive++;
+      loadingSet[idx] = true;
+      (function (i) {
+        var im = new Image();
+        im.onload = function () { bgDone(i, true); };
+        im.onerror = function () { bgDone(i, false); };
+        im.src = frameSrc(i);
+      })(idx);
+    }
+  }
+  function bgDone(i, ok) {
+    delete loadingSet[i];
+    bgActive--;
+    if (ok) loaded[i] = true; else failed[i] = true;
+    window.__framesLoaded = countLoaded();
+    updateShownFrame();
+    pumpQueue();
+  }
+
   function setHeroProgress(p) {
     heroProgress = p;
     window.__heroProgress = p;
-    for (var i = 0; i < FRAME_N; i++) frameEls[i].style.opacity = frameOpacity(i, p).toFixed(3);
+    heroTargetFrame = targetFrameFor(p);
+    window.__heroFrameTarget = heroTargetFrame;
+    updateShownFrame();
     if (heroStage) heroStage.style.transform = 'scale(' + (1 + 0.08 * p).toFixed(4) + ')';
     if (heroBottom) heroBottom.style.opacity = (1 - 0.75 * sstep(0.3, 0.6, p)).toFixed(3);
     updateRevealActive();
     updateSpiderArmed();
+    pumpQueue(); /* re-prioritise the loader around the new target */
   }
   if (reduced) {
     document.documentElement.classList.add('reduced');
-    setHeroProgress(1); /* static finale (frame 10), no scrub; spider stays armed (see updateSpiderArmed) */
+    setHeroProgress(1); /* static finale (vf-190), no scrub; spider stays armed (see updateSpiderArmed) */
     if (heroBottom) heroBottom.style.opacity = '1'; /* static hero keeps the full intro overlay */
   } else if (hasST) {
     ScrollTrigger.create({
@@ -624,29 +699,25 @@ setTimeout(function () {
     onScroll();
   }
 
-  /* ---------- Spider-suit hover (portrait frame only) ----------
-     Layered over frame 7 (the front portrait) only. Armed while the
-     portrait dominates (p ~0.61-0.72) and before the light-reveal takes
-     over (p >= 0.80) — it only ever touches the spider layer's opacity,
-     so it cannot fight the scroll scrub. In reduced motion the hero is a
-     static frame 10 and the spider stays armed, so the hover still works.
+  /* ---------- Spider-suit hover (finale only) ----------
+     Layered over the video frame at the finale (p 0.80-0.95, face to
+     camera). Same cover fit as the video frames, so it layers over the
+     finale framing. It only ever touches the spider layer's opacity, so
+     it cannot fight the scroll scrub. In reduced motion the hero is a
+     static vf-190 and the spider stays armed, so the hover still works.
      Desktop: hover the model. Touch: tap the model to toggle. */
   var spiderLayer = document.getElementById('spiderLayer');
   var spiderHint = document.getElementById('spiderHint');
   var spiderHintText = document.getElementById('spiderHintText');
   var spiderSticky = document.querySelector('.hero-sticky');
   var spiderArmed = false, spiderShown = false, spiderToggle = false;
-  var SPIDER_IMG_W = 1552, SPIDER_IMG_H = 1328;
   if (spiderHintText && !finePointer) spiderHintText.textContent = 'TAP ME';
   function modelZone() {
-    /* contain-fitted image rect inside the stage, then the model's
-       torso/head sub-rect (x 30-70%, y 5-92% of the rendered image). */
+    /* cover fit: the image fills the whole stage; the model is centred,
+       so the zone is a sub-rect of the stage itself. */
     if (!heroStage) return null;
     var r = heroStage.getBoundingClientRect();
-    var sc = Math.min(r.width / SPIDER_IMG_W, r.height / SPIDER_IMG_H);
-    var dw = SPIDER_IMG_W * sc, dh = SPIDER_IMG_H * sc;
-    var ox = r.left + (r.width - dw) / 2, oy = r.top + (r.height - dh) / 2;
-    return { x0: ox + dw * 0.30, x1: ox + dw * 0.70, y0: oy + dh * 0.05, y1: oy + dh * 0.92 };
+    return { x0: r.left + r.width * 0.30, x1: r.left + r.width * 0.70, y0: r.top + r.height * 0.05, y1: r.top + r.height * 0.92 };
   }
   function inModelZone(cx, cy) {
     var z = modelZone();
@@ -692,8 +763,7 @@ setTimeout(function () {
     if (spiderHint && spiderArmed) spiderHint.classList.add('visible');
   }
   function updateSpiderArmed() {
-    var o7 = frameOpacity(6, heroProgress); /* frame 7 dominates at p = 6/9 */
-    spiderArmed = reduced || (o7 > 0.5 && heroProgress < 0.80);
+    spiderArmed = reduced || (heroProgress >= 0.80 && heroProgress < 0.95);
     window.__spiderArmed = spiderArmed;
     if (!spiderLayer || !spiderHint) return;
     if (!spiderArmed) {
@@ -749,7 +819,7 @@ setTimeout(function () {
     m.globalCompositeOperation = 'source-over';
     m.fillStyle = '#000';
     m.fillRect(0, 0, maskCanvas.width, maskCanvas.height);
-    if (!revealImg) { revealImg = new Image(); revealImg.src = HERO_SRC[FRAME_N - 1]; } /* frame 10, the finale */
+    if (!revealImg) { revealImg = new Image(); revealImg.src = FINALE_SRC; } /* vf-190, the finale */
   }
   function clearReveal() {
     if (!revealCanvas) return;
@@ -784,8 +854,9 @@ setTimeout(function () {
       mctx.fill();
     }
     ctx.clearRect(0, 0, W, H);
+    if (spiderShown) return; /* the spider suit stays clean while it is up */
     var iw = revealImg.naturalWidth, ih = revealImg.naturalHeight;
-    var sc = Math.min(W / iw, H / ih); /* contain math, matching the <img> rendering */
+    var sc = Math.max(W / iw, H / ih); /* cover math, matching the <img> rendering */
     var dw = iw * sc, dh = ih * sc;
     ctx.globalCompositeOperation = 'source-over';
     ctx.drawImage(revealImg, (W - dw) / 2, (H - dh) / 2, dw, dh);
