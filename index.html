@@ -8,7 +8,7 @@
 <meta property="og:title" content="Subham Thakur — Full-Stack Developer &amp; AI Engineer">
 <meta property="og:description" content="Live web apps and AI tools — full-stack products people can open and use.">
 <meta property="og:type" content="website">
-<meta property="og:image" content="https://subham-thakur.vercel.app/src/hero/hero-3.webp">
+<meta property="og:image" content="https://subham-thakur.vercel.app/src/hero/frame-07.webp">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23ff2a2a'/><text x='50' y='68' font-size='52' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'>ST</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -75,8 +75,8 @@
   .ghost-text { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:19vw; font-weight:900; letter-spacing:-.02em; white-space:nowrap; color:transparent; -webkit-text-stroke:1px rgba(255,42,42,.16); z-index:0; user-select:none; pointer-events:none; }
   .hero-stage { position:absolute; inset:0; z-index:1; will-change:transform; }
   .hero-stage img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; user-select:none; -webkit-user-drag:none; }
-  #stage1 { opacity:1; }
-  #stage2, #stage3, #stage4 { opacity:0; }
+  .hero-frame { opacity:0; }
+  #frame1 { opacity:1; }
   #revealCanvas { position:absolute; inset:0; width:100%; height:100%; z-index:4; pointer-events:none; }
   @media (hover:none), (max-width:767px) { #revealCanvas { display:none; } }
   #spiderLayer { z-index:2; opacity:0; transition:opacity .5s ease; pointer-events:none; }
@@ -251,10 +251,16 @@ setTimeout(function () {
   <div class="hero-sticky" id="top">
     <div class="ghost-text" aria-hidden="true">SUBHAM</div>
     <div class="hero-stage" id="heroStage">
-      <img id="stage1" src="src/hero/hero-1.webp" alt="Subham Thakur, head bowed, standing on a red block" draggable="false" fetchpriority="high">
-      <img id="stage2" src="src/hero/hero-2.webp" alt="Subham Thakur looking up at the camera" draggable="false">
-      <img id="stage3" src="src/hero/hero-3.webp" alt="Subham Thakur, front-facing studio portrait" draggable="false">
-      <img id="stage4" src="src/hero/hero-4.webp" alt="Subham Thakur in a noir look, fedora and sunglasses" draggable="false">
+      <img class="hero-frame" id="frame1" src="src/hero/frame-01.webp" alt="Subham Thakur in a black suit, head bowed, standing on a red block" draggable="false" fetchpriority="high">
+      <img class="hero-frame" id="frame2" src="src/hero/frame-02.webp" alt="Subham Thakur in a black suit, head lifting" draggable="false">
+      <img class="hero-frame" id="frame3" src="src/hero/frame-03.webp" alt="Subham Thakur in a black suit, head half-raised" draggable="false">
+      <img class="hero-frame" id="frame4" src="src/hero/frame-04.webp" alt="Subham Thakur in a black suit, looking up at the camera" draggable="false">
+      <img class="hero-frame" id="frame5" src="src/hero/frame-05.webp" alt="Subham Thakur in a black suit, camera descending" draggable="false">
+      <img class="hero-frame" id="frame6" src="src/hero/frame-06.webp" alt="Subham Thakur in a black suit, three-quarter view" draggable="false">
+      <img class="hero-frame" id="frame7" src="src/hero/frame-07.webp" alt="Subham Thakur in a black suit, front-facing studio portrait" draggable="false">
+      <img class="hero-frame" id="frame8" src="src/hero/frame-08.webp" alt="Subham Thakur in a black suit, warming red light" draggable="false">
+      <img class="hero-frame" id="frame9" src="src/hero/frame-09.webp" alt="Subham Thakur in a black suit, pre-finale" draggable="false">
+      <img class="hero-frame" id="frame10" src="src/hero/frame-10.webp" alt="Subham Thakur in a black suit, noir finale" draggable="false">
       <img id="spiderLayer" src="src/hero/spider.webp" alt="" aria-hidden="true" draggable="false">
       <canvas id="revealCanvas" aria-hidden="true"></canvas>
     </div>
@@ -439,7 +445,7 @@ setTimeout(function () {
     <h2 class="reveal">Experience</h2>
     <div class="about-grid">
       <figure class="about-photo reveal">
-        <img src="src/frontface.jpg" alt="Subham Thakur" loading="lazy">
+        <img src="src/hero/frame-07.webp" alt="Subham Thakur" loading="lazy">
         <figcaption><strong>Subham Thakur</strong><span>Full-Stack Developer · AI Engineer<br>Punjab, India</span></figcaption>
       </figure>
       <div>
@@ -513,7 +519,7 @@ setTimeout(function () {
   function sstep(a, b, x) { var t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); }
   function easeOutCubic(x) { return 1 - Math.pow(1 - x, 3); }
 
-  var HERO_SRC = ['src/hero/hero-1.webp', 'src/hero/hero-2.webp', 'src/hero/hero-3.webp', 'src/hero/hero-4.webp', 'src/hero/spider.webp'];
+  var HERO_SRC = ['src/hero/frame-01.webp', 'src/hero/frame-02.webp', 'src/hero/frame-03.webp', 'src/hero/frame-04.webp', 'src/hero/frame-05.webp', 'src/hero/frame-06.webp', 'src/hero/frame-07.webp', 'src/hero/frame-08.webp', 'src/hero/frame-09.webp', 'src/hero/frame-10.webp', 'src/hero/spider.webp'];
 
   /* ---------- Preloader ---------- */
   var preloader = document.getElementById('preloader');
@@ -560,23 +566,34 @@ setTimeout(function () {
   if (skipBtn) skipBtn.addEventListener('click', function () { finishPreloader(true); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') finishPreloader(true); });
 
-  /* ---------- Hero scrub ---------- */
-  var stageEls = [1, 2, 3, 4].map(function (n) { return document.getElementById('stage' + n); });
+  /* ---------- Hero scrub: 10-frame scroll sequence ----------
+     Frame i (0-based) dominates at p = i/9. Each frame crossfades with its
+     neighbours over a window centred halfway between the two dominance
+     points, so the scroll reads as one continuous shot. */
+  var FRAME_N = 10;
+  var FRAME_HALF = 0.035; /* half-width of each crossfade window */
+  var frameEls = [];
+  for (var fi = 1; fi <= FRAME_N; fi++) frameEls.push(document.getElementById('frame' + fi));
   var heroStage = document.getElementById('heroStage');
   var heroBottom = document.getElementById('heroBottom');
   var heroScroll = document.getElementById('heroScroll');
   var heroProgress = 0;
+  function frameOpacity(i, p) {
+    var o = 1;
+    if (i > 0) {
+      var cIn = (i - 0.5) / (FRAME_N - 1);
+      o *= sstep(cIn - FRAME_HALF, cIn + FRAME_HALF, p);
+    }
+    if (i < FRAME_N - 1) {
+      var cOut = (i + 0.5) / (FRAME_N - 1);
+      o *= 1 - sstep(cOut - FRAME_HALF, cOut + FRAME_HALF, p);
+    }
+    return o;
+  }
   function setHeroProgress(p) {
     heroProgress = p;
     window.__heroProgress = p;
-    var o1 = 1 - sstep(0.06, 0.28, p);
-    var o2 = sstep(0.06, 0.28, p) * (1 - sstep(0.39, 0.61, p));
-    var o3 = sstep(0.39, 0.61, p) * (1 - sstep(0.72, 0.94, p));
-    var o4 = sstep(0.72, 0.94, p);
-    stageEls[0].style.opacity = o1.toFixed(3);
-    stageEls[1].style.opacity = o2.toFixed(3);
-    stageEls[2].style.opacity = o3.toFixed(3);
-    stageEls[3].style.opacity = o4.toFixed(3);
+    for (var i = 0; i < FRAME_N; i++) frameEls[i].style.opacity = frameOpacity(i, p).toFixed(3);
     if (heroStage) heroStage.style.transform = 'scale(' + (1 + 0.08 * p).toFixed(4) + ')';
     if (heroBottom) heroBottom.style.opacity = (1 - 0.75 * sstep(0.3, 0.6, p)).toFixed(3);
     updateRevealActive();
@@ -584,7 +601,7 @@ setTimeout(function () {
   }
   if (reduced) {
     document.documentElement.classList.add('reduced');
-    setHeroProgress(0.65); /* pure stage 3 (o3 = 1), spider still armed (p < 0.66), no scrub */
+    setHeroProgress(1); /* static finale (frame 10), no scrub; spider stays armed (see updateSpiderArmed) */
     if (heroBottom) heroBottom.style.opacity = '1'; /* static hero keeps the full intro overlay */
   } else if (hasST) {
     ScrollTrigger.create({
@@ -607,10 +624,12 @@ setTimeout(function () {
     onScroll();
   }
 
-  /* ---------- Spider-suit hover (portrait stage only) ----------
-     Layered over stage 3 only. Armed while the portrait dominates and
-     before the light-reveal takes over (p >= 0.66) — it only ever touches
-     the spider layer's opacity, so it cannot fight the scroll scrub.
+  /* ---------- Spider-suit hover (portrait frame only) ----------
+     Layered over frame 7 (the front portrait) only. Armed while the
+     portrait dominates (p ~0.61-0.72) and before the light-reveal takes
+     over (p >= 0.80) — it only ever touches the spider layer's opacity,
+     so it cannot fight the scroll scrub. In reduced motion the hero is a
+     static frame 10 and the spider stays armed, so the hover still works.
      Desktop: hover the model. Touch: tap the model to toggle. */
   var spiderLayer = document.getElementById('spiderLayer');
   var spiderHint = document.getElementById('spiderHint');
@@ -673,8 +692,8 @@ setTimeout(function () {
     if (spiderHint && spiderArmed) spiderHint.classList.add('visible');
   }
   function updateSpiderArmed() {
-    var o3 = sstep(0.39, 0.61, heroProgress) * (1 - sstep(0.72, 0.94, heroProgress));
-    spiderArmed = o3 > 0.5 && heroProgress < 0.66;
+    var o7 = frameOpacity(6, heroProgress); /* frame 7 dominates at p = 6/9 */
+    spiderArmed = reduced || (o7 > 0.5 && heroProgress < 0.80);
     window.__spiderArmed = spiderArmed;
     if (!spiderLayer || !spiderHint) return;
     if (!spiderArmed) {
@@ -706,16 +725,17 @@ setTimeout(function () {
   window.addEventListener('resize', function () { if (spiderArmed) positionSpiderHint(); });
   updateSpiderArmed();
 
-  /* ---------- Light reveal (noir painted over the portrait) ---------- */
+  /* ---------- Light reveal (finale painted over the late frames) ---------- */
   var revealCanvas = document.getElementById('revealCanvas');
   var stickyEl = document.querySelector('.hero-sticky');
   var revealActive = false, revealRaf = null, revealImg = null, maskCanvas = null;
   var mouse = { x: -9999, y: -9999 };
   var revealDpr = 1;
   function updateRevealActive() {
-    var should = !reduced && finePointer && !!revealCanvas && window.innerWidth >= 768 && heroProgress >= 0.66;
+    var should = !reduced && finePointer && !!revealCanvas && window.innerWidth >= 768 && heroProgress >= 0.80;
     if (should && !revealActive) { revealActive = true; startRevealLoop(); }
     else if (!should && revealActive) { revealActive = false; clearReveal(); }
+    window.__revealActive = revealActive;
   }
   function sizeReveal() {
     if (!revealCanvas || !heroStage) return;
@@ -729,7 +749,7 @@ setTimeout(function () {
     m.globalCompositeOperation = 'source-over';
     m.fillStyle = '#000';
     m.fillRect(0, 0, maskCanvas.width, maskCanvas.height);
-    if (!revealImg) { revealImg = new Image(); revealImg.src = HERO_SRC[3]; }
+    if (!revealImg) { revealImg = new Image(); revealImg.src = HERO_SRC[FRAME_N - 1]; } /* frame 10, the finale */
   }
   function clearReveal() {
     if (!revealCanvas) return;
