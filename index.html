@@ -79,6 +79,11 @@
   #stage2, #stage3, #stage4 { opacity:0; }
   #revealCanvas { position:absolute; inset:0; width:100%; height:100%; z-index:4; pointer-events:none; }
   @media (hover:none), (max-width:767px) { #revealCanvas { display:none; } }
+  #spiderLayer { z-index:2; opacity:0; transition:opacity .5s ease; pointer-events:none; }
+  .spider-hint { position:absolute; z-index:7; display:flex; align-items:center; gap:10px; color:var(--red); font-size:10px; letter-spacing:.22em; font-weight:600; white-space:nowrap; opacity:0; transition:opacity .4s ease; pointer-events:none; text-transform:uppercase; }
+  .spider-hint.visible { animation:hintPulse 2.2s ease-in-out infinite; }
+  .spider-hint-line { display:block; width:28px; height:1px; background:rgba(255,42,42,.7); flex:none; }
+  @keyframes hintPulse { 0%,100% { opacity:.55; } 50% { opacity:1; } }
   .red-circle { --d:min(76vh,88vw,680px); position:absolute; left:calc(50% - var(--d)/2); top:calc(50% - var(--d)/2); width:var(--d); height:var(--d); border:1px solid rgba(255,42,42,.8); border-radius:50%; z-index:3; pointer-events:none; }
   .hero-bottom { position:absolute; left:0; right:0; bottom:0; z-index:5; padding:0 24px 24px; }
   @media (min-width:768px) { .hero-bottom { padding:0 64px 36px; } }
@@ -249,9 +254,11 @@ setTimeout(function () {
       <img id="stage2" src="src/hero/hero-2.webp" alt="Subham Thakur looking up at the camera" draggable="false">
       <img id="stage3" src="src/hero/hero-3.webp" alt="Subham Thakur, front-facing studio portrait" draggable="false">
       <img id="stage4" src="src/hero/hero-4.webp" alt="Subham Thakur in a noir look, fedora and sunglasses" draggable="false">
+      <img id="spiderLayer" src="src/hero/spider.webp" alt="" aria-hidden="true" draggable="false">
       <canvas id="revealCanvas" aria-hidden="true"></canvas>
     </div>
     <div class="red-circle" id="redCircle" aria-hidden="true"></div>
+    <div class="spider-hint" id="spiderHint" aria-hidden="true"><span class="spider-hint-line"></span><span id="spiderHintText">HOVER OVER ME</span></div>
     <div class="hero-bottom" id="heroBottom">
       <div class="hero-bottom-row">
         <div>
@@ -505,7 +512,7 @@ setTimeout(function () {
   function sstep(a, b, x) { var t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); }
   function easeOutCubic(x) { return 1 - Math.pow(1 - x, 3); }
 
-  var HERO_SRC = ['src/hero/hero-1.webp', 'src/hero/hero-2.webp', 'src/hero/hero-3.webp', 'src/hero/hero-4.webp'];
+  var HERO_SRC = ['src/hero/hero-1.webp', 'src/hero/hero-2.webp', 'src/hero/hero-3.webp', 'src/hero/hero-4.webp', 'src/hero/spider.webp'];
 
   /* ---------- Preloader ---------- */
   var preloader = document.getElementById('preloader');
@@ -572,6 +579,7 @@ setTimeout(function () {
     if (heroStage) heroStage.style.transform = 'scale(' + (1 + 0.08 * p).toFixed(4) + ')';
     if (heroBottom) heroBottom.style.opacity = (1 - 0.75 * sstep(0.3, 0.6, p)).toFixed(3);
     updateRevealActive();
+    updateSpiderArmed();
   }
   if (reduced) {
     document.documentElement.classList.add('reduced');
@@ -596,6 +604,98 @@ setTimeout(function () {
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
   }
+
+  /* ---------- Spider-suit hover (portrait stage only) ----------
+     Layered over stage 3 only. Armed while the portrait dominates and
+     before the light-reveal takes over (p >= 0.66) — it only ever touches
+     the spider layer's opacity, so it cannot fight the scroll scrub.
+     Desktop: hover the model. Touch: tap the model to toggle. */
+  var spiderLayer = document.getElementById('spiderLayer');
+  var spiderHint = document.getElementById('spiderHint');
+  var spiderHintText = document.getElementById('spiderHintText');
+  var spiderSticky = document.querySelector('.hero-sticky');
+  var spiderArmed = false, spiderShown = false, spiderToggle = false;
+  var SPIDER_IMG_W = 1552, SPIDER_IMG_H = 1328;
+  if (spiderHintText && !finePointer) spiderHintText.textContent = 'TAP ME';
+  function modelZone() {
+    /* contain-fitted image rect inside the stage, then the model's
+       torso/head sub-rect (x 30-70%, y 5-92% of the rendered image). */
+    if (!heroStage) return null;
+    var r = heroStage.getBoundingClientRect();
+    var sc = Math.min(r.width / SPIDER_IMG_W, r.height / SPIDER_IMG_H);
+    var dw = SPIDER_IMG_W * sc, dh = SPIDER_IMG_H * sc;
+    var ox = r.left + (r.width - dw) / 2, oy = r.top + (r.height - dh) / 2;
+    return { x0: ox + dw * 0.30, x1: ox + dw * 0.70, y0: oy + dh * 0.05, y1: oy + dh * 0.92 };
+  }
+  function inModelZone(cx, cy) {
+    var z = modelZone();
+    return !!z && cx >= z.x0 && cx <= z.x1 && cy >= z.y0 && cy <= z.y1;
+  }
+  function positionSpiderHint() {
+    if (!spiderHint || !spiderSticky) return;
+    var z = modelZone();
+    if (!z) return;
+    var sr = spiderSticky.getBoundingClientRect();
+    var hw = spiderHint.offsetWidth, hh = spiderHint.offsetHeight || 20;
+    var left, top;
+    if (finePointer) {
+      left = z.x1 - sr.left + 16;
+      top = z.y0 - sr.top + (z.y1 - z.y0) * 0.28;
+      if (left + hw > sr.width - 10) left = z.x0 - sr.left - 16 - hw; /* flip to the left side */
+      if (left < 10) { left = z.x0 - sr.left + (z.x1 - z.x0) / 2 - hw / 2; top = z.y0 - sr.top - 28; }
+    } else {
+      left = z.x0 - sr.left + (z.x1 - z.x0) / 2 - hw / 2;
+      top = z.y1 - sr.top + 12;
+      if (top + hh > sr.height - 150) top = z.y0 - sr.top - 28; /* keep clear of the bottom overlay */
+    }
+    spiderHint.style.left = Math.round(left) + 'px';
+    spiderHint.style.top = Math.round(top) + 'px';
+  }
+  function showSpider() {
+    if (!spiderLayer) return;
+    spiderShown = true;
+    spiderLayer.style.opacity = '1';
+    if (spiderHint) spiderHint.classList.remove('visible');
+  }
+  function hideSpider() {
+    if (!spiderLayer) return;
+    spiderShown = false; spiderToggle = false;
+    spiderLayer.style.opacity = '0';
+    if (spiderHint && spiderArmed) spiderHint.classList.add('visible');
+  }
+  function updateSpiderArmed() {
+    var o3 = sstep(0.39, 0.61, heroProgress) * (1 - sstep(0.72, 0.94, heroProgress));
+    spiderArmed = o3 > 0.5 && heroProgress < 0.66;
+    window.__spiderArmed = spiderArmed;
+    if (!spiderLayer || !spiderHint) return;
+    if (!spiderArmed) {
+      spiderShown = false; spiderToggle = false;
+      spiderLayer.style.opacity = '0';
+      spiderHint.classList.remove('visible');
+    } else {
+      positionSpiderHint();
+      if (!spiderShown) spiderHint.classList.add('visible');
+    }
+  }
+  if (spiderSticky) {
+    spiderSticky.addEventListener('pointermove', function (e) {
+      if (!finePointer) return;
+      if (spiderArmed && inModelZone(e.clientX, e.clientY)) showSpider();
+      else if (spiderShown && !spiderToggle) hideSpider();
+    });
+    spiderSticky.addEventListener('pointerleave', function () {
+      if (finePointer && spiderShown && !spiderToggle) hideSpider();
+    });
+    spiderSticky.addEventListener('click', function (e) {
+      if (finePointer) return; /* touch only: tap toggles */
+      if (spiderArmed && inModelZone(e.clientX, e.clientY)) {
+        spiderToggle = !spiderToggle;
+        if (spiderToggle) showSpider(); else hideSpider();
+      }
+    });
+  }
+  window.addEventListener('resize', function () { if (spiderArmed) positionSpiderHint(); });
+  updateSpiderArmed();
 
   /* ---------- Light reveal (noir painted over the portrait) ---------- */
   var revealCanvas = document.getElementById('revealCanvas');
