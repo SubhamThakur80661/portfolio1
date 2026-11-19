@@ -508,21 +508,36 @@ setTimeout(function () {
   function sstep(a, b, x) { var t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); }
   function easeOutCubic(x) { return 1 - Math.pow(1 - x, 3); }
 
-  /* ---------- Video frames: 190 real frames (Google Flow / Veo 3.1 Lite,
-     8s clip @ 24fps, 1280x688 webp). Frame 1 = head bowed, frame 190 =
-     face to camera with red smoke. ---------- */
+  /* ---------- Video frames: TWO sets, one per orientation ----------
+     Landscape: 190 real frames (Google Flow / Veo 3.1 Lite, 8s 16:9 clip
+     @ 24fps, 1280x688 webp). Portrait: the same beats from a 9:16 clip
+     (720x1236 webp). Frame 1 = head bowed, frame 190 = face to camera
+     with red smoke. Only the current viewport's set is ever loaded. */
   var FRAME_N = 190;
+  var FRAME_SETS = {
+    landscape: { dir: 'src/hero/video', prefix: 'vf' },
+    portrait: { dir: 'src/hero/video-portrait', prefix: 'pv' }
+  };
+  function isPortraitViewport() { return window.innerWidth < window.innerHeight; }
+  var activeSet = isPortraitViewport() ? 'portrait' : 'landscape';
+  window.__frameSet = activeSet;
   var SPIDER_SRC = 'src/hero/spider.webp';
-  var FINALE_SRC = 'src/hero/video/vf-190.webp';
-  var loaded = [], failed = [], loadingSet = {};
-  function frameSrc(i) {
+  var loadState = {
+    landscape: { loaded: [], failed: [], loading: {} },
+    portrait: { loaded: [], failed: [], loading: {} }
+  };
+  function cur() { return loadState[activeSet]; }
+  function frameSrcFor(setName, i) {
     var s = String(i);
     while (s.length < 3) s = '0' + s;
-    return 'src/hero/video/vf-' + s + '.webp';
+    var set = FRAME_SETS[setName];
+    return set.dir + '/' + set.prefix + '-' + s + '.webp';
   }
+  function frameSrc(i) { return frameSrcFor(activeSet, i); }
+  function finaleSrc() { return frameSrcFor(activeSet, 190); }
   function countLoaded() {
-    var n = 0;
-    for (var i = 1; i <= FRAME_N; i++) if (loaded[i]) n++;
+    var n = 0, ld = cur().loaded;
+    for (var i = 1; i <= FRAME_N; i++) if (ld[i]) n++;
     return n;
   }
   window.__framesTotal = FRAME_N;
@@ -570,17 +585,20 @@ setTimeout(function () {
     if (loadPct) loadPct.textContent = Math.round((criticalLoaded / CRITICAL_TOTAL) * 100) + '%';
     if (criticalLoaded >= CRITICAL_TOTAL) setTimeout(function () { finishPreloader(false); }, 250);
   }
+  var initialSet = activeSet, initialState = loadState[initialSet];
   CRITICAL.forEach(function (idx) {
-    loadingSet[idx] = true;
+    initialState.loading[idx] = true;
     var im = new Image();
     im.onload = function () {
-      delete loadingSet[idx]; loaded[idx] = true;
-      window.__framesLoaded = countLoaded();
-      updateShownFrame();
+      delete initialState.loading[idx]; initialState.loaded[idx] = true;
+      if (initialSet === activeSet) {
+        window.__framesLoaded = countLoaded();
+        updateShownFrame();
+      }
       countCritical();
     };
-    im.onerror = function () { delete loadingSet[idx]; failed[idx] = true; countCritical(); };
-    im.src = frameSrc(idx);
+    im.onerror = function () { delete initialState.loading[idx]; initialState.failed[idx] = true; countCritical(); };
+    im.src = frameSrcFor(initialSet, idx);
   });
   var spiderPre = new Image();
   spiderPre.onload = countCritical;
@@ -601,17 +619,19 @@ setTimeout(function () {
   var heroBottom = document.getElementById('heroBottom');
   var heroScroll = document.getElementById('heroScroll');
   var heroProgress = 0;
-  var heroTargetFrame = 1, heroShownFrame = 1;
-  window.__heroFrame = 1;
+  var heroTargetFrame = 1, heroShownFrame = 0; /* 0 = no frame set yet: the first updateShownFrame always writes the active set's src (the HTML img starts as vf-001, which is wrong on portrait) */
+  window.__heroFrame = 0;
   window.__heroFrameTarget = 1;
   function targetFrameFor(p) { return Math.round(p * (FRAME_N - 1)) + 1; }
   function nearestLoadedAtOrBefore(t) {
-    for (var i = t; i >= 1; i--) if (loaded[i]) return i;
-    return 1; /* frame 1 is in the critical set; never blank */
+    var ld = cur().loaded;
+    for (var i = t; i >= 1; i--) if (ld[i]) return i;
+    return 0; /* nothing of this set loaded yet — caller keeps the current src */
   }
   function updateShownFrame() {
     if (!heroVideoImg) return;
     var best = nearestLoadedAtOrBefore(heroTargetFrame);
+    if (best === 0) return; /* new set still loading — keep showing the old frame */
     if (best !== heroShownFrame) {
       heroShownFrame = best;
       heroVideoImg.src = frameSrc(best);
@@ -630,12 +650,12 @@ setTimeout(function () {
     pumpQueue();
   }
   function nextBgIndex() {
-    var t = heroTargetFrame, d, i;
+    var st = cur(), t = heroTargetFrame, d, i;
     for (d = 0; d <= 30; d++) {
-      if (t + d <= FRAME_N && !loaded[t + d] && !failed[t + d] && !loadingSet[t + d]) return t + d;
-      if (d > 0 && t - d >= 1 && !loaded[t - d] && !failed[t - d] && !loadingSet[t - d]) return t - d;
+      if (t + d <= FRAME_N && !st.loaded[t + d] && !st.failed[t + d] && !st.loading[t + d]) return t + d;
+      if (d > 0 && t - d >= 1 && !st.loaded[t - d] && !st.failed[t - d] && !st.loading[t - d]) return t - d;
     }
-    for (i = 1; i <= FRAME_N; i++) if (!loaded[i] && !failed[i] && !loadingSet[i]) return i;
+    for (i = 1; i <= FRAME_N; i++) if (!st.loaded[i] && !st.failed[i] && !st.loading[i]) return i;
     return 0;
   }
   function pumpQueue() {
@@ -644,21 +664,25 @@ setTimeout(function () {
       var idx = nextBgIndex();
       if (!idx) return;
       bgActive++;
-      loadingSet[idx] = true;
-      (function (i) {
+      (function (i, setName) {
+        var st = loadState[setName];
+        st.loading[i] = true;
         var im = new Image();
-        im.onload = function () { bgDone(i, true); };
-        im.onerror = function () { bgDone(i, false); };
-        im.src = frameSrc(i);
-      })(idx);
+        im.onload = function () { bgDone(i, true, setName); };
+        im.onerror = function () { bgDone(i, false, setName); };
+        im.src = frameSrcFor(setName, i);
+      })(idx, activeSet);
     }
   }
-  function bgDone(i, ok) {
-    delete loadingSet[i];
+  function bgDone(i, ok, setName) {
+    var st = loadState[setName || activeSet];
+    delete st.loading[i];
     bgActive--;
-    if (ok) loaded[i] = true; else failed[i] = true;
-    window.__framesLoaded = countLoaded();
-    updateShownFrame();
+    if (ok) st.loaded[i] = true; else st.failed[i] = true;
+    if (setName === activeSet) {
+      window.__framesLoaded = countLoaded();
+      updateShownFrame();
+    }
     pumpQueue();
   }
 
@@ -699,6 +723,66 @@ setTimeout(function () {
     onScroll();
   }
 
+  /* ---------- Frame-set switching (portrait <-> landscape) ----------
+     Rotating the phone (or resizing across square) swaps the frame set.
+     Scroll progress is kept: the same frame number shows from the new set
+     as soon as its critical frames arrive. Until then the old set's frame
+     stays on screen (updateShownFrame skips unloaded targets), so the
+     hero never goes blank mid-rotation. */
+  function ensureCriticalFrames() {
+    var setName = activeSet, st = loadState[setName];
+    CRITICAL.forEach(function (idx) {
+      if (st.loaded[idx] || st.failed[idx] || st.loading[idx]) return;
+      st.loading[idx] = true;
+      (function (i, sName, s) {
+        var im = new Image();
+        im.onload = function () {
+          delete s.loading[i]; s.loaded[i] = true;
+          if (sName === activeSet) { window.__framesLoaded = countLoaded(); updateShownFrame(); }
+          pumpQueue();
+        };
+        im.onerror = function () { delete s.loading[i]; s.failed[i] = true; pumpQueue(); };
+        im.src = frameSrcFor(sName, i);
+      })(idx, setName, st);
+    });
+  }
+  function switchFrameSet() {
+    var next = isPortraitViewport() ? 'portrait' : 'landscape';
+    if (next === activeSet) return;
+    activeSet = next;
+    window.__frameSet = activeSet;
+    heroShownFrame = 0; /* force the src swap to the new set */
+    window.__framesLoaded = countLoaded();
+    ensureCriticalFrames();
+    updateShownFrame();
+    updateSpiderPosition();
+    revealImg = null; /* the light-reveal finale comes from the new set */
+    if (revealActive) { clearReveal(); sizeReveal(); }
+    pumpQueue();
+  }
+  var progressBeforeResize = null, switchTimer = null;
+  function onViewportResize() {
+    /* Capture the scroll progress on the FIRST resize event — before
+       ScrollTrigger's debounced refresh re-derives it from the preserved
+       pixel scroll position in the new viewport height. */
+    if (progressBeforeResize === null) progressBeforeResize = heroProgress;
+    if (switchTimer) clearTimeout(switchTimer);
+    switchTimer = setTimeout(function () {
+      var keepP = progressBeforeResize;
+      progressBeforeResize = null;
+      switchFrameSet();
+      /* Keep the scroll progress: the same p in the new viewport height.
+         Only while the hero is on screen — never yank the user back if
+         they have scrolled past it. */
+      if (!reduced && keepP !== null) {
+        var heroRange = 3 * window.innerHeight;
+        if (window.scrollY <= heroRange + 50) window.scrollTo(0, keepP * heroRange);
+      }
+    }, 150);
+  }
+  window.addEventListener('resize', onViewportResize);
+  window.addEventListener('orientationchange', onViewportResize);
+
   /* ---------- Spider-suit hover (finale only) ----------
      Layered over the video frame at the finale (p 0.80-0.95, face to
      camera). Same cover fit as the video frames, so it layers over the
@@ -711,6 +795,15 @@ setTimeout(function () {
   var spiderHintText = document.getElementById('spiderHintText');
   var spiderSticky = document.querySelector('.hero-sticky');
   var spiderArmed = false, spiderShown = false, spiderToggle = false;
+  function updateSpiderPosition() {
+    /* Portrait: the video finale's eyes sit at 31% height but the mask's
+       eyes sit at 23%, so the suit layer drops 9% to land the mask on the
+       face (measured on both images). Landscape: no offset — verified
+       aligned as-is. The layer's top/bottom are black, so the shift is
+       seamless against the black hero background. */
+    if (!spiderLayer) return;
+    spiderLayer.style.transform = (activeSet === 'portrait') ? 'translateY(9%)' : '';
+  }
   if (spiderHintText && !finePointer) spiderHintText.textContent = 'TAP ME';
   function modelZone() {
     /* cover fit: the image fills the whole stage; the model is centred,
@@ -736,15 +829,12 @@ setTimeout(function () {
       if (left + hw > sr.width - 10) left = z.x0 - sr.left - 16 - hw; /* flip to the left side */
       if (left < 10) { left = z.x0 - sr.left + (z.x1 - z.x0) / 2 - hw / 2; top = z.y0 - sr.top - 28; }
     } else {
+      /* Touch: centred on the model's chest (~58% height) — clearly visible
+         on the black suit, inside the red circle, well above the bottom
+         overlay. The old spot below the circle collided with the footer
+         links, which is why nobody saw the hint. */
       left = z.x0 - sr.left + (z.x1 - z.x0) / 2 - hw / 2;
-      /* sit just below the red circle, clear of the image and the overlay */
-      var d = Math.min(0.76 * sr.height, 0.88 * sr.width, 680); /* matches .red-circle --d */
-      top = (sr.height + d) / 2 + 10;
-      var overlayTop = heroBottom ? heroBottom.getBoundingClientRect().top - sr.top : sr.height;
-      if (top + hh > overlayTop - 8) {
-        top = z.y0 - sr.top - 28; /* no room below: above the model */
-        if (top < 4) top = z.y1 - sr.top - hh - 10; /* last resort: inside, bottom of the zone */
-      }
+      top = sr.height * 0.58;
     }
     left = Math.max(8, Math.min(left, sr.width - hw - 8)); /* never off the sides */
     spiderHint.style.left = Math.round(left) + 'px';
@@ -793,6 +883,7 @@ setTimeout(function () {
     });
   }
   window.addEventListener('resize', function () { if (spiderArmed) positionSpiderHint(); });
+  updateSpiderPosition();
   updateSpiderArmed();
 
   /* ---------- Light reveal (finale painted over the late frames) ---------- */
@@ -819,7 +910,7 @@ setTimeout(function () {
     m.globalCompositeOperation = 'source-over';
     m.fillStyle = '#000';
     m.fillRect(0, 0, maskCanvas.width, maskCanvas.height);
-    if (!revealImg) { revealImg = new Image(); revealImg.src = FINALE_SRC; } /* vf-190, the finale */
+    if (!revealImg) { revealImg = new Image(); revealImg.src = finaleSrc(); } /* frame 190 of the current set, the finale */
   }
   function clearReveal() {
     if (!revealCanvas) return;
