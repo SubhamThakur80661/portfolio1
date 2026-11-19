@@ -583,7 +583,8 @@ setTimeout(function () {
   }
   if (reduced) {
     document.documentElement.classList.add('reduced');
-    setHeroProgress(0.55); /* stage 3 plateau, no scrub */
+    setHeroProgress(0.65); /* pure stage 3 (o3 = 1), spider still armed (p < 0.66), no scrub */
+    if (heroBottom) heroBottom.style.opacity = '1'; /* static hero keeps the full intro overlay */
   } else if (hasST) {
     ScrollTrigger.create({
       trigger: '#heroScroll', start: 'top top', end: 'bottom bottom', scrub: 0.6,
