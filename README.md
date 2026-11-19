@@ -1,12 +1,7 @@
-# Subham Thakur — Portfolio
+# Subham Thakur — Portfolio (v2)
 
-Personal portfolio website. Static site — no build step.
+Live: https://subham-thakur.vercel.app
 
-- **Live:** https://subham-thakur.vercel.app
-- **Stack:** HTML + Tailwind CSS (CDN) + Three.js hero scene + GSAP scroll motion
-- **Photo:** `src/frontface.jpg`
+Spider Noir hero — a scroll-driven portrait sequence (head bowed → look up → portrait → noir reveal) — plus a deal-wheel project showcase: 7 live projects dealt into a turning wheel of cards.
 
-Sections: hero with an interactive 3D particle scene, live projects (agent-anywhere,
-RankVista, OpCit, ReachInbox + more), skills, experience, contact.
-
-Deploys to Vercel from the `master` branch.
+Static site: single `index.html` + images, no build step. GSAP + ScrollTrigger via CDN.
