@@ -75,9 +75,10 @@
   .ghost-text { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:19vw; font-weight:900; letter-spacing:-.02em; white-space:nowrap; color:transparent; -webkit-text-stroke:1px rgba(255,42,42,.16); z-index:0; user-select:none; pointer-events:none; }
   .hero-stage { position:absolute; inset:0; z-index:1; will-change:transform; }
   .hero-stage img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; user-select:none; -webkit-user-drag:none; }
+  #heroCanvas { position:absolute; inset:0; width:100%; height:100%; display:block; }
   #revealCanvas { position:absolute; inset:0; width:100%; height:100%; z-index:4; pointer-events:none; }
   @media (hover:none), (max-width:767px) { #revealCanvas { display:none; } }
-  #spiderLayer { z-index:2; opacity:0; transition:opacity .5s ease; pointer-events:none; object-position:center 25%; }
+  #spiderLayer { z-index:2; opacity:0; transition:opacity .5s ease; pointer-events:none; } /* geometry set inline by updateSpiderPosition (head-matched rect) */
   .spider-hint { position:absolute; z-index:7; display:flex; align-items:center; gap:10px; color:var(--red); font-size:10px; letter-spacing:.22em; font-weight:600; white-space:nowrap; opacity:0; transition:opacity .4s ease; pointer-events:none; text-transform:uppercase; }
   .spider-hint.visible { opacity:1; animation:hintPulse 2.2s ease-in-out infinite; }
   .spider-hint-line { display:block; width:28px; height:1px; background:rgba(255,42,42,.7); flex:none; }
@@ -113,6 +114,12 @@
   #wheelStage { position:relative; height:660px; margin-top:48px; overflow:hidden; perspective:1300px; cursor:grab; touch-action:pan-y; user-select:none; -webkit-user-select:none; }
   #wheelStage.dragging { cursor:grabbing; }
   #wheel { position:absolute; inset:0; transform-style:preserve-3d; }
+  /* The cards sit at translateZ(-3), behind the #wheel plane in the
+     preserve-3d context, so #wheel eats every click meant for a card
+     link. Let clicks pass through #wheel; the cards re-enable them.
+     Drag still works: pointerdown on a card bubbles to #wheelStage. */
+  #wheel { pointer-events:none; }
+  #wheel .wheel-card { pointer-events:auto; }
   .wheel-card { width:238px; height:326px; will-change:transform; }
   #wheelStage.wheel-on .wheel-card { position:absolute; left:50%; top:50%; margin-left:-119px; margin-top:-163px; }
   /* No-JS / not-initialised: clean grid */
@@ -217,13 +224,16 @@
   </div>
 </div>
 <script>
-/* Safety: if the main script fails to run, never leave the preloader up. */
+/* Safety: if the main script fails to run, never leave the preloader up.
+   30s (not 12s): the preloader now loads all 190 frames before lifting,
+   which takes longer than 12s on a slow connection — this must only fire
+   when the main script is actually dead. */
 setTimeout(function () {
   if (window.__pfDone) return;
   var p = document.getElementById('preloader');
   if (p) p.style.display = 'none';
   document.documentElement.style.overflow = '';
-}, 12000);
+}, 30000);
 </script>
 
 <!-- NAV -->
@@ -249,7 +259,7 @@ setTimeout(function () {
   <div class="hero-sticky" id="top">
     <div class="ghost-text" aria-hidden="true">SUBHAM</div>
     <div class="hero-stage" id="heroStage">
-      <img id="heroVideoImg" src="src/hero/video/vf-001.webp" alt="Subham Thakur in a black suit — head bowed, then lifting to face the camera" draggable="false" fetchpriority="high">
+      <canvas id="heroCanvas" role="img" aria-label="Subham Thakur in a black suit — head bowed, then lifting to face the camera"></canvas>
       <img id="spiderLayer" src="src/hero/spider.webp" alt="" aria-hidden="true" draggable="false">
       <canvas id="revealCanvas" aria-hidden="true"></canvas>
     </div>
@@ -354,7 +364,7 @@ setTimeout(function () {
             <p class="card-sub">Data-fusion dashboard</p>
             <p class="card-line">Intelligence dashboard with an OSINT map and electoral analytics.</p>
             <div class="card-tags"><span class="mini-tag">React</span><span class="mini-tag">Leaflet</span><span class="mini-tag">Data viz</span></div>
-            <div class="card-links"><span class="demo-txt">Live demo ↗</span></div>
+            <div class="card-links"><span class="demo-txt">Live demo ↗</span><a class="code-txt" href="https://github.com/SubhamThakur80661/cyberjoar-ai" target="_blank" rel="noopener">Code ↗</a></div>
           </div>
           <div class="card-face card-back" aria-hidden="true"><span class="mono">CJ</span><span class="bk-sub">SUBHAM THAKUR</span></div>
         </div>
@@ -368,7 +378,7 @@ setTimeout(function () {
             <p class="card-sub">Log viewer</p>
             <p class="card-line">Stream, filter and search logs in real time — dev tooling that stays out of the way.</p>
             <div class="card-tags"><span class="mini-tag">React</span><span class="mini-tag">Streaming</span></div>
-            <div class="card-links"><span class="demo-txt">Live demo ↗</span></div>
+            <div class="card-links"><span class="demo-txt">Live demo ↗</span><a class="code-txt" href="https://github.com/SubhamThakur80661/trace-app" target="_blank" rel="noopener">Code ↗</a></div>
           </div>
           <div class="card-face card-back" aria-hidden="true"><span class="mono">TA</span><span class="bk-sub">SUBHAM THAKUR</span></div>
         </div>
@@ -382,7 +392,7 @@ setTimeout(function () {
             <p class="card-sub">Token leaderboard</p>
             <p class="card-line">Token leaderboard app with a 3D slider and animated rankings.</p>
             <div class="card-tags"><span class="mini-tag">React</span><span class="mini-tag">3D UI</span></div>
-            <div class="card-links"><span class="demo-txt">Live demo ↗</span></div>
+            <div class="card-links"><span class="demo-txt">Live demo ↗</span><a class="code-txt" href="https://github.com/SubhamThakur80661/tokentease" target="_blank" rel="noopener">Code ↗</a></div>
           </div>
           <div class="card-face card-back" aria-hidden="true"><span class="mono">TT</span><span class="bk-sub">SUBHAM THAKUR</span></div>
         </div>
@@ -512,7 +522,9 @@ setTimeout(function () {
      Landscape: 190 real frames (Google Flow / Veo 3.1 Lite, 8s 16:9 clip
      @ 24fps, 1280x688 webp). Portrait: the same beats from a 9:16 clip
      (720x1236 webp). Frame 1 = head bowed, frame 190 = face to camera
-     with red smoke. Only the current viewport's set is ever loaded. */
+     with red smoke. Only the current viewport's set is ever loaded.
+     The images arrays hold the Image objects so the hero canvas can
+     drawImage them; loaded/failed are the per-frame status maps. */
   var FRAME_N = 190;
   var FRAME_SETS = {
     landscape: { dir: 'src/hero/video', prefix: 'vf' },
@@ -523,8 +535,8 @@ setTimeout(function () {
   window.__frameSet = activeSet;
   var SPIDER_SRC = 'src/hero/spider.webp';
   var loadState = {
-    landscape: { loaded: [], failed: [], loading: {} },
-    portrait: { loaded: [], failed: [], loading: {} }
+    landscape: { images: [], loaded: [], failed: [], loading: {} },
+    portrait: { images: [], loaded: [], failed: [], loading: {} }
   };
   function cur() { return loadState[activeSet]; }
   function frameSrcFor(setName, i) {
@@ -552,7 +564,8 @@ setTimeout(function () {
     if (preDone) return;
     preDone = true;
     window.__pfDone = true;
-    startBackgroundLoad(); /* the rest of the frames keep loading behind the hero */
+    startBackgroundLoad(); /* finishes any frames a SKIP left behind; no-op when preload-all completed */
+    queueRender(); /* paint the current frame now the hero is visible */
     document.documentElement.style.overflow = '';
     if (!preloader) return;
     if (hasGsap && !instant) {
@@ -572,76 +585,130 @@ setTimeout(function () {
     if (hasST) ScrollTrigger.refresh();
     startIntro();
   }
-  /* Critical set: frames 1-30 (the first stretch of the scroll) + frame 190
-     (finale / reduced-motion static / light-reveal source) + the spider.
-     The preloader counts only these; the rest load in the background. */
-  var CRITICAL = [];
-  for (var ci = 1; ci <= 30; ci++) CRITICAL.push(ci);
-  CRITICAL.push(190);
-  var CRITICAL_TOTAL = CRITICAL.length + 1; /* + spider */
-  var criticalLoaded = 0;
-  function countCritical() {
-    criticalLoaded++;
-    if (loadPct) loadPct.textContent = Math.round((criticalLoaded / CRITICAL_TOTAL) * 100) + '%';
-    if (criticalLoaded >= CRITICAL_TOTAL) setTimeout(function () { finishPreloader(false); }, 250);
+  /* Preload ALL 190 frames of the active set before lifting (the reference
+     does the same with its 240) — the % counter counts all 190. The old
+     build revealed after 32 critical frames and streamed the rest, so on
+     a first scroll the scrub could stick on an old frame and jump; that
+     was the main visible difference from the reference. The other set
+     stays lazy: it loads only on an orientation change, never blocking
+     the reveal. Failures count too, so a bad frame can't hang the load. */
+  var preloadCount = 0;
+  function countPreload() {
+    preloadCount++;
+    if (loadPct) loadPct.textContent = Math.round((preloadCount / FRAME_N) * 100) + '%';
+    if (preloadCount >= FRAME_N) setTimeout(function () { finishPreloader(false); }, 250);
   }
   var initialSet = activeSet, initialState = loadState[initialSet];
-  CRITICAL.forEach(function (idx) {
-    initialState.loading[idx] = true;
-    var im = new Image();
-    im.onload = function () {
-      delete initialState.loading[idx]; initialState.loaded[idx] = true;
-      if (initialSet === activeSet) {
-        window.__framesLoaded = countLoaded();
-        updateShownFrame();
-      }
-      countCritical();
-    };
-    im.onerror = function () { delete initialState.loading[idx]; initialState.failed[idx] = true; countCritical(); };
-    im.src = frameSrcFor(initialSet, idx);
-  });
+  for (var pi = 1; pi <= FRAME_N; pi++) {
+    (function (idx) {
+      initialState.loading[idx] = true;
+      var im = new Image();
+      initialState.images[idx] = im;
+      im.onload = function () {
+        delete initialState.loading[idx]; initialState.loaded[idx] = true;
+        if (initialSet === activeSet) {
+          window.__framesLoaded = countLoaded();
+          if (idx === targetIndex + 1) queueRender();
+        }
+        countPreload();
+      };
+      im.onerror = function () { delete initialState.loading[idx]; initialState.failed[idx] = true; countPreload(); };
+      im.src = frameSrcFor(initialSet, idx);
+    })(pi);
+  }
   var spiderPre = new Image();
-  spiderPre.onload = countCritical;
-  spiderPre.onerror = countCritical; /* never hang on a failed image */
-  spiderPre.src = SPIDER_SRC;
-  setTimeout(function () { finishPreloader(false); }, 9000); /* hard safety */
+  spiderPre.src = SPIDER_SRC; /* cache-warm only; the spider is not counted in the 190 */
   var skipBtn = document.getElementById('skipLoad');
   if (skipBtn) skipBtn.addEventListener('click', function () { finishPreloader(true); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') finishPreloader(true); });
 
-  /* ---------- Hero scrub: single-element video-frame scroll ----------
-     ONE <img> whose src follows scroll progress: frame = round(p*189)+1.
-     Only LOADED frames are ever shown — the scrub shows the nearest loaded
-     frame at or before the target, so the hero is never blank while the
-     background loader catches up. */
-  var heroVideoImg = document.getElementById('heroVideoImg');
+  /* ---------- Hero canvas: the reference's rendering technique ----------
+     Frames are drawn on a <canvas> with drawImage inside
+     requestAnimationFrame, redrawing ONLY when the frame index changes
+     (the old build swapped an <img> src, which can flicker and
+     decode-stutter on mobile). Frame index = floor(p * 189), 0-based
+     (frames 1..190 map to indices 0..189), exactly like the reference.
+     The canvas backing store is DPR-aware (capped at 2 — the source
+     frames are 720-1280px wide, so higher DPR buys no detail); CSS
+     keeps it full-bleed in the stage. drawImage uses WIDTH-FIT math,
+     exactly like the reference (scale = canvasWidth / img.width, x = 0,
+     y centred) — the full model is always in view, never cropped at
+     the sides, and there is NO zoom (the user found the zoomed hero
+     too cropped). The black bars top/bottom on non-matching aspects
+     are invisible on the black hero background. If the target frame
+     isn't loaded yet the canvas keeps its previous content, so the
+     hero is never blank. */
+  var heroCanvas = document.getElementById('heroCanvas');
+  var heroCtx = heroCanvas ? heroCanvas.getContext('2d', { alpha: false }) : null;
   var heroStage = document.getElementById('heroStage');
   var heroBottom = document.getElementById('heroBottom');
   var heroScroll = document.getElementById('heroScroll');
   var heroProgress = 0;
-  var heroTargetFrame = 1, heroShownFrame = 0; /* 0 = no frame set yet: the first updateShownFrame always writes the active set's src (the HTML img starts as vf-001, which is wrong on portrait) */
-  window.__heroFrame = 0;
-  window.__heroFrameTarget = 1;
-  function targetFrameFor(p) { return Math.round(p * (FRAME_N - 1)) + 1; }
-  function nearestLoadedAtOrBefore(t) {
-    var ld = cur().loaded;
-    for (var i = t; i >= 1; i--) if (ld[i]) return i;
-    return 0; /* nothing of this set loaded yet — caller keeps the current src */
+  var targetIndex = 0; /* 0-based frame index the scroll wants */
+  var drawnIndex = -1; /* 0-based index actually on the canvas (-1 = nothing drawn yet) */
+  var renderQueued = false;
+  window.__heroFrame = -1;
+  window.__heroFrameTarget = 0;
+  window.__heroFrameSrc = null;
+  function targetIndexFor(p) { return Math.floor(p * (FRAME_N - 1)); }
+  function frameImage(i) { /* i is 1-based */
+    var im = cur().images[i];
+    return (im && im.complete && im.naturalWidth > 0) ? im : null;
   }
-  function updateShownFrame() {
-    if (!heroVideoImg) return;
-    var best = nearestLoadedAtOrBefore(heroTargetFrame);
-    if (best === 0) return; /* new set still loading — keep showing the old frame */
-    if (best !== heroShownFrame) {
-      heroShownFrame = best;
-      heroVideoImg.src = frameSrc(best);
-      window.__heroFrame = best;
+  function renderFrame() {
+    renderQueued = false;
+    if (!heroCanvas || !heroCtx) return;
+    var img = frameImage(targetIndex + 1);
+    var idx = targetIndex;
+    if (!img && drawnIndex < 0) {
+      /* Nothing has ever been drawn (e.g. frame 1 failed to load): fall
+         back to the nearest loaded frame at or before the target so the
+         hero is never black after the preloader lifts. */
+      for (var i = targetIndex + 1; i >= 1; i--) {
+        img = frameImage(i);
+        if (img) { idx = i - 1; break; }
+      }
     }
+    if (!img) return; /* target not ready — keep the previous canvas content */
+    var cw = heroCanvas.width, ch = heroCanvas.height;
+    if (cw === 0 || ch === 0) return;
+    var iw = img.naturalWidth, ih = img.naturalHeight;
+    /* WIDTH-FIT (reference-exact): scale = canvasWidth / img.width. */
+    var sc = cw / iw;
+    var dw = iw * sc, dh = ih * sc;
+    var dy = (ch - dh) / 2;
+    heroCtx.fillStyle = '#000';
+    heroCtx.fillRect(0, 0, cw, ch); /* clear stale pixels when the set/aspect changes */
+    heroCtx.drawImage(img, 0, dy, dw, dh);
+    drawnIndex = idx;
+    window.__heroFrame = drawnIndex;
+    window.__heroFrameSrc = frameSrcFor(activeSet, idx + 1);
+    window.__heroDrawRect = { x: 0, y: dy, w: dw, h: dh };
   }
+  function queueRender() {
+    if (renderQueued) return;
+    renderQueued = true;
+    requestAnimationFrame(renderFrame);
+  }
+  function sizeHeroCanvas() {
+    if (!heroCanvas || !heroStage) return;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = Math.max(1, Math.round(heroStage.clientWidth * dpr));
+    var h = Math.max(1, Math.round(heroStage.clientHeight * dpr));
+    if (heroCanvas.width !== w || heroCanvas.height !== h) {
+      heroCanvas.width = w; /* resizing clears the canvas — repaint below */
+      heroCanvas.height = h;
+    }
+    if (drawnIndex >= 0) queueRender();
+  }
+  window.addEventListener('resize', sizeHeroCanvas);
+  sizeHeroCanvas();
 
-  /* Background loader: fills in the remaining frames after the preloader,
-     6 at a time, always prioritising a window around the current scroll
-     target so a fast scroll never outruns the cache for long. */
+  /* Background loader: fills in the remaining frames, 6 at a time, always
+     prioritising a window around the current scroll target. With
+     preload-all it is a no-op for the initial set; it does the real work
+     after an orientation change (loading the other set) and after a SKIP
+     (finishing the active set). */
   var bgStarted = false, bgActive = 0;
   var BG_CONCURRENCY = 6;
   function startBackgroundLoad() {
@@ -650,7 +717,7 @@ setTimeout(function () {
     pumpQueue();
   }
   function nextBgIndex() {
-    var st = cur(), t = heroTargetFrame, d, i;
+    var st = cur(), t = targetIndex + 1, d, i;
     for (d = 0; d <= 30; d++) {
       if (t + d <= FRAME_N && !st.loaded[t + d] && !st.failed[t + d] && !st.loading[t + d]) return t + d;
       if (d > 0 && t - d >= 1 && !st.loaded[t - d] && !st.failed[t - d] && !st.loading[t - d]) return t - d;
@@ -668,6 +735,7 @@ setTimeout(function () {
         var st = loadState[setName];
         st.loading[i] = true;
         var im = new Image();
+        st.images[i] = im;
         im.onload = function () { bgDone(i, true, setName); };
         im.onerror = function () { bgDone(i, false, setName); };
         im.src = frameSrcFor(setName, i);
@@ -681,7 +749,7 @@ setTimeout(function () {
     if (ok) st.loaded[i] = true; else st.failed[i] = true;
     if (setName === activeSet) {
       window.__framesLoaded = countLoaded();
-      updateShownFrame();
+      if (ok && i === targetIndex + 1) queueRender();
     }
     pumpQueue();
   }
@@ -689,10 +757,13 @@ setTimeout(function () {
   function setHeroProgress(p) {
     heroProgress = p;
     window.__heroProgress = p;
-    heroTargetFrame = targetFrameFor(p);
-    window.__heroFrameTarget = heroTargetFrame;
-    updateShownFrame();
-    if (heroStage) heroStage.style.transform = 'scale(' + (1 + 0.08 * p).toFixed(4) + ')';
+    targetIndex = targetIndexFor(p);
+    window.__heroFrameTarget = targetIndex;
+    if (targetIndex !== drawnIndex) queueRender();
+    /* No zoom: the canvas stays at scale 1 throughout. The reference
+       zooms 1 -> 1.1 and the old build zoomed 1 -> 1.08, but the user
+       found the zoomed hero too cropped ("quite zoomed, not a complete
+       full model view") — so the zoom is deliberately dropped. */
     if (heroBottom) heroBottom.style.opacity = (1 - 0.75 * sstep(0.3, 0.6, p)).toFixed(3);
     updateRevealActive();
     updateSpiderArmed();
@@ -704,7 +775,7 @@ setTimeout(function () {
     if (heroBottom) heroBottom.style.opacity = '1'; /* static hero keeps the full intro overlay */
   } else if (hasST) {
     ScrollTrigger.create({
-      trigger: '#heroScroll', start: 'top top', end: 'bottom bottom', scrub: 0.6,
+      trigger: '#heroScroll', start: 'top top', end: 'bottom bottom', scrub: 1,
       onUpdate: function (self) { setHeroProgress(self.progress); }
     });
   } else {
@@ -725,40 +796,23 @@ setTimeout(function () {
 
   /* ---------- Frame-set switching (portrait <-> landscape) ----------
      Rotating the phone (or resizing across square) swaps the frame set.
-     Scroll progress is kept: the same frame number shows from the new set
-     as soon as its critical frames arrive. Until then the old set's frame
-     stays on screen (updateShownFrame skips unloaded targets), so the
-     hero never goes blank mid-rotation. */
-  function ensureCriticalFrames() {
-    var setName = activeSet, st = loadState[setName];
-    CRITICAL.forEach(function (idx) {
-      if (st.loaded[idx] || st.failed[idx] || st.loading[idx]) return;
-      st.loading[idx] = true;
-      (function (i, sName, s) {
-        var im = new Image();
-        im.onload = function () {
-          delete s.loading[i]; s.loaded[i] = true;
-          if (sName === activeSet) { window.__framesLoaded = countLoaded(); updateShownFrame(); }
-          pumpQueue();
-        };
-        im.onerror = function () { delete s.loading[i]; s.failed[i] = true; pumpQueue(); };
-        im.src = frameSrcFor(sName, i);
-      })(idx, setName, st);
-    });
-  }
+     Scroll progress is kept: the same frame index shows from the new set
+     as soon as its frames arrive. Until then the canvas keeps showing
+     the old set's frame (renderFrame only draws complete images), so
+     the hero never goes blank mid-rotation. The background loader fills
+     the new set, prioritised around the current target. */
   function switchFrameSet() {
     var next = isPortraitViewport() ? 'portrait' : 'landscape';
     if (next === activeSet) return;
     activeSet = next;
     window.__frameSet = activeSet;
-    heroShownFrame = 0; /* force the src swap to the new set */
     window.__framesLoaded = countLoaded();
-    ensureCriticalFrames();
-    updateShownFrame();
     updateSpiderPosition();
-    revealImg = null; /* the light-reveal finale comes from the new set */
+    /* the brush-reveal image is the spider (set-independent), so it is
+       NOT reset here — only the canvases re-size for the new viewport. */
     if (revealActive) { clearReveal(); sizeReveal(); }
     pumpQueue();
+    queueRender(); /* redraw the current frame from the new set if it is already cached */
   }
   var progressBeforeResize = null, switchTimer = null;
   function onViewportResize() {
@@ -783,34 +837,63 @@ setTimeout(function () {
   window.addEventListener('resize', onViewportResize);
   window.addEventListener('orientationchange', onViewportResize);
 
-  /* ---------- Spider-suit hover (finale only) ----------
-     Layered over the video frame at the finale (p 0.80-0.95, face to
-     camera). Same cover fit as the video frames, so it layers over the
-     finale framing. It only ever touches the spider layer's opacity, so
-     it cannot fight the scroll scrub. In reduced motion the hero is a
-     static vf-190 and the spider stays armed, so the hover still works.
-     Desktop: hover the model. Touch: tap the model to toggle. */
+  /* ---------- Spider suit: brush reveal on desktop, tap toggle on touch ----------
+     Alignment is MEASURED on the actual images (visual grounding): mask
+     eyes at 22.3% of the spider image height; face eyes at 34.2%
+     (landscape finale) / 31.2% (portrait finale); head heights
+     (hair-top to chin) 25.5% spider, 37.5% landscape finale, 34.3%
+     portrait finale. The spider is drawn HEAD-SIZE-MATCHED to the
+     finale face — drawn height = face-head-height / mask-head-height
+     x hero drawn height — and shifted so the mask eyes land on the face
+     eyes. Plain width-fit would draw the spider at half size on
+     portrait: the spider shot is a full-body near-square image while
+     the finale is a close-up. Desktop (fine pointer): the BRUSH REVEAL
+     below paints the spider only where the cursor moves — there is no
+     full-toggle hover any more. Touch: tap the model to toggle the full
+     suit. Armed at p >= 0.90 (the reference uses the last 2%; ours keeps
+     the last 10% so it stays discoverable). */
+  var SPIDER_DIMS = { w: 1552, h: 1328 };
+  var FRAME_DIMS = { landscape: { w: 1280, h: 688 }, portrait: { w: 720, h: 1236 } };
+  var EYE_FRAC = { spider: 0.223, landscape: 0.342, portrait: 0.312 };
+  var HEAD_FRAC = { spider: 0.255, landscape: 0.375, portrait: 0.343 };
+  function heroDrawRect(W, H, setName) {
+    /* width-fit rect of the set's frame on a W x H stage */
+    var d = FRAME_DIMS[setName];
+    var dh = d.h * W / d.w;
+    return { w: W, h: dh, x: 0, y: (H - dh) / 2 };
+  }
+  function spiderDrawRect(W, H, setName) {
+    /* head-size-matched spider rect on a W x H stage, eyes aligned */
+    var hr = heroDrawRect(W, H, setName);
+    var faceEyesY = hr.y + EYE_FRAC[setName] * hr.h;
+    var dh = HEAD_FRAC[setName] * hr.h / HEAD_FRAC.spider;
+    var dw = dh * SPIDER_DIMS.w / SPIDER_DIMS.h;
+    return { w: dw, h: dh, x: (W - dw) / 2, y: faceEyesY - EYE_FRAC.spider * dh };
+  }
   var spiderLayer = document.getElementById('spiderLayer');
   var spiderHint = document.getElementById('spiderHint');
   var spiderHintText = document.getElementById('spiderHintText');
   var spiderSticky = document.querySelector('.hero-sticky');
   var spiderArmed = false, spiderShown = false, spiderToggle = false;
   function updateSpiderPosition() {
-    /* Portrait: the video finale's eyes sit at 31% height but the mask's
-       eyes sit at 23%, so the suit layer drops 9% to land the mask on the
-       face (measured on both images). Landscape: no offset — verified
-       aligned as-is. The layer's top/bottom are black, so the shift is
-       seamless against the black hero background. */
-    if (!spiderLayer) return;
-    spiderLayer.style.transform = (activeSet === 'portrait') ? 'translateY(9%)' : '';
+    /* the tap overlay <img> gets its exact head-matched rect in px */
+    if (!spiderLayer || !heroStage) return;
+    var r = spiderDrawRect(heroStage.clientWidth, heroStage.clientHeight, activeSet);
+    spiderLayer.style.width = Math.round(r.w) + 'px';
+    spiderLayer.style.height = Math.round(r.h) + 'px';
+    spiderLayer.style.left = Math.round(r.x) + 'px';
+    spiderLayer.style.top = Math.round(r.y) + 'px';
+    spiderLayer.style.transform = '';
+    window.__spiderRect = r;
   }
   if (spiderHintText && !finePointer) spiderHintText.textContent = 'TAP ME';
   function modelZone() {
-    /* cover fit: the image fills the whole stage; the model is centred,
-       so the zone is a sub-rect of the stage itself. */
+    /* width-fit: the frame spans the full stage width; the model is
+       centred, so the zone is a sub-rect of the DRAWN frame rect. */
     if (!heroStage) return null;
     var r = heroStage.getBoundingClientRect();
-    return { x0: r.left + r.width * 0.30, x1: r.left + r.width * 0.70, y0: r.top + r.height * 0.05, y1: r.top + r.height * 0.92 };
+    var fr = heroDrawRect(r.width, r.height, activeSet);
+    return { x0: r.left + r.width * 0.30, x1: r.left + r.width * 0.70, y0: r.top + fr.y + fr.h * 0.05, y1: r.top + fr.y + fr.h * 0.92 };
   }
   function inModelZone(cx, cy) {
     var z = modelZone();
@@ -853,7 +936,7 @@ setTimeout(function () {
     if (spiderHint && spiderArmed) spiderHint.classList.add('visible');
   }
   function updateSpiderArmed() {
-    spiderArmed = reduced || (heroProgress >= 0.80 && heroProgress < 0.95);
+    spiderArmed = reduced || heroProgress >= 0.90;
     window.__spiderArmed = spiderArmed;
     if (!spiderLayer || !spiderHint) return;
     if (!spiderArmed) {
@@ -866,34 +949,38 @@ setTimeout(function () {
     }
   }
   if (spiderSticky) {
-    spiderSticky.addEventListener('pointermove', function (e) {
-      if (!finePointer) return;
-      if (spiderArmed && inModelZone(e.clientX, e.clientY)) showSpider();
-      else if (spiderShown && !spiderToggle) hideSpider();
-    });
-    spiderSticky.addEventListener('pointerleave', function () {
-      if (finePointer && spiderShown && !spiderToggle) hideSpider();
-    });
+    /* Touch only: tap the model to toggle the full suit. Desktop has no
+       toggle — the brush reveal below is the mouse effect. */
     spiderSticky.addEventListener('click', function (e) {
-      if (finePointer) return; /* touch only: tap toggles */
+      if (finePointer) return;
       if (spiderArmed && inModelZone(e.clientX, e.clientY)) {
         spiderToggle = !spiderToggle;
         if (spiderToggle) showSpider(); else hideSpider();
       }
     });
   }
-  window.addEventListener('resize', function () { if (spiderArmed) positionSpiderHint(); });
+  window.addEventListener('resize', function () { updateSpiderPosition(); if (spiderArmed) positionSpiderHint(); });
   updateSpiderPosition();
   updateSpiderArmed();
 
-  /* ---------- Light reveal (finale painted over the late frames) ---------- */
+  /* ---------- Brush reveal (the reference's mouse effect, reel-exact) ----------
+     A mask canvas pre-filled black; every tick it fades toward black
+     (rgba(0,0,0,0.05)) while the mouse draws a radial-gradient
+     destination-out brush (radius 250) that erases the mask where the
+     cursor moves. The reveal canvas draws the spider and applies the
+     mask, so the suit shows ONLY where the cursor has brushed, with a
+     fading trail. Desktop / fine pointer only; armed at p >= 0.90 (the
+     reference uses the last 2% — frames 235-240 — ours keeps the last
+     10% so it stays discoverable). In reduced motion the hero is a
+     static finale (p = 1), so the brush still works — it is
+     mouse-driven, not scroll-driven. */
   var revealCanvas = document.getElementById('revealCanvas');
   var stickyEl = document.querySelector('.hero-sticky');
   var revealActive = false, revealRaf = null, revealImg = null, maskCanvas = null;
   var mouse = { x: -9999, y: -9999 };
   var revealDpr = 1;
   function updateRevealActive() {
-    var should = !reduced && finePointer && !!revealCanvas && window.innerWidth >= 768 && heroProgress >= 0.80;
+    var should = finePointer && !!revealCanvas && window.innerWidth >= 768 && heroProgress >= 0.90;
     if (should && !revealActive) { revealActive = true; startRevealLoop(); }
     else if (!should && revealActive) { revealActive = false; clearReveal(); }
     window.__revealActive = revealActive;
@@ -910,7 +997,7 @@ setTimeout(function () {
     m.globalCompositeOperation = 'source-over';
     m.fillStyle = '#000';
     m.fillRect(0, 0, maskCanvas.width, maskCanvas.height);
-    if (!revealImg) { revealImg = new Image(); revealImg.src = finaleSrc(); } /* frame 190 of the current set, the finale */
+    if (!revealImg) { revealImg = new Image(); revealImg.src = SPIDER_SRC; window.__revealSrc = SPIDER_SRC; } /* the spider — the brush reveals the suit, not the finale */
   }
   function clearReveal() {
     if (!revealCanvas) return;
@@ -930,14 +1017,14 @@ setTimeout(function () {
     var W = revealCanvas.width, H = revealCanvas.height;
     if (!ctx || !mctx || W === 0 || H === 0) return;
     mctx.globalCompositeOperation = 'source-over';
-    mctx.fillStyle = 'rgba(0,0,0,0.045)'; /* trail fades */
+    mctx.fillStyle = 'rgba(0,0,0,0.05)'; /* trail fades — reel-exact */
     mctx.fillRect(0, 0, W, H);
     if (mouse.x >= 0 && mouse.y >= 0) {
       mctx.globalCompositeOperation = 'destination-out';
-      var rad = 230 * revealDpr;
+      var rad = 250 * revealDpr; /* reel-exact brush radius */
       var g = mctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, rad);
       g.addColorStop(0, 'rgba(255,255,255,1)');
-      g.addColorStop(0.4, 'rgba(255,255,255,0.85)');
+      g.addColorStop(0.4, 'rgba(255,255,255,0.8)');
       g.addColorStop(1, 'rgba(255,255,255,0)');
       mctx.fillStyle = g;
       mctx.beginPath();
@@ -945,12 +1032,11 @@ setTimeout(function () {
       mctx.fill();
     }
     ctx.clearRect(0, 0, W, H);
-    if (spiderShown) return; /* the spider suit stays clean while it is up */
-    var iw = revealImg.naturalWidth, ih = revealImg.naturalHeight;
-    var sc = Math.max(W / iw, H / ih); /* cover math, matching the <img> rendering */
-    var dw = iw * sc, dh = ih * sc;
+    /* the spider, head-size-matched to the finale face (same rect math
+       as the tap overlay) — visible only where the brush erased the mask */
+    var sr = spiderDrawRect(W, H, activeSet);
     ctx.globalCompositeOperation = 'source-over';
-    ctx.drawImage(revealImg, (W - dw) / 2, (H - dh) / 2, dw, dh);
+    ctx.drawImage(revealImg, sr.x, sr.y, sr.w, sr.h);
     ctx.globalCompositeOperation = 'destination-out';
     ctx.drawImage(maskCanvas, 0, 0);
   }
@@ -974,6 +1060,7 @@ setTimeout(function () {
     stickyEl.addEventListener('mouseleave', function () { mouse.x = -9999; mouse.y = -9999; });
   }
   window.addEventListener('resize', function () { if (revealActive) sizeReveal(); });
+  updateRevealActive(); /* reduced motion sets p = 1 before this section runs — arm the brush now */
 
   /* ---------- Deal wheel (projects) ---------- */
   var wheelStage = document.getElementById('wheelStage');
@@ -1089,19 +1176,26 @@ setTimeout(function () {
     if (window.innerWidth < 640) teardownWheel();
     else { layoutWheel(); initWheel(); }
   });
+  var pointerCaptured = false;
   wheelStage.addEventListener('pointerdown', function (e) {
     if (!WHEEL_ON) return;
-    dragging = true; dragMoved = 0;
+    dragging = true; dragMoved = 0; pointerCaptured = false;
     dragStartX = e.clientX; lastMoveX = e.clientX; lastMoveT = performance.now();
     dragStartTarget = wheelTarget;
     wheelVel = 0;
     wheelStage.classList.add('dragging');
-    try { wheelStage.setPointerCapture(e.pointerId); } catch (err) {}
+    /* No setPointerCapture here: capturing on pointerdown retargets the
+       click to the stage, so the card links never fire. Capture only
+       once the pointer has actually moved past the drag threshold. */
   });
   wheelStage.addEventListener('pointermove', function (e) {
     if (!dragging) return;
     var dx = e.clientX - dragStartX;
     dragMoved = Math.max(dragMoved, Math.abs(dx));
+    if (dragMoved > 8 && !pointerCaptured) {
+      pointerCaptured = true;
+      try { wheelStage.setPointerCapture(e.pointerId); } catch (err) {}
+    }
     wheelTarget = clamp(dragStartTarget + dx * 0.14, -MAX_ANGLE, MAX_ANGLE);
     var now = performance.now();
     var dtm = (now - lastMoveT) / 1000;
@@ -1110,10 +1204,16 @@ setTimeout(function () {
   });
   function endDrag() {
     if (!dragging) return;
-    dragging = false;
+    dragging = false; pointerCaptured = false;
     wheelStage.classList.remove('dragging');
     if (performance.now() - lastMoveT > 80) wheelVel = 0; /* paused before release: no flick */
-    if (dragMoved > 8) suppressClick = true;
+    if (dragMoved > 8) {
+      suppressClick = true;
+      /* Self-clearing: the click that follows a drag normally consumes
+         this flag, but no click fires when the drag started on a link,
+         which left the flag stuck and ate the NEXT real click. */
+      setTimeout(function () { suppressClick = false; }, 150);
+    }
   }
   wheelStage.addEventListener('pointerup', endDrag);
   wheelStage.addEventListener('pointercancel', endDrag);
