@@ -2,8 +2,6 @@
 
 Live: https://subham-thakur.vercel.app
 
-Spider Noir hero — a scroll-driven portrait sequence (head bowed → look up → portrait → noir reveal) — plus a deal-wheel project showcase: 7 live projects dealt into a turning wheel of cards.
+Video-frame canvas hero — 190 frames of an 8-second clip drawn on a canvas, scrubbed by scrolling (portrait frames on phones, landscape on desktop). At the end of the sequence, brushing the mouse over the portrait paints the Spider-Noir suit in only where the cursor passes, with a fading trail (tap toggles it on touch). Below that, a deal-wheel showcase of 7 live projects.
 
-Static site: single `index.html` + images, no build step. GSAP + ScrollTrigger via CDN.
-
-Hover the portrait at stage 3 and the Spider-Noir suit fades in (tap on touch). The light-reveal at the final stage paints the noir look in with the mouse.
+Static site: single `index.html` + frame images, no build step. GSAP + ScrollTrigger via CDN.
